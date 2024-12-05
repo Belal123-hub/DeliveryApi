@@ -1,8 +1,9 @@
+using DeliveryWebApi.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var connection = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<APIDBcontext>(options => options.UseNpgsql(connection));// Add services to the container.
+builder.Services.AddDbContext<ApiDbContext>(options => options.UseNpgsql(connection));// Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
