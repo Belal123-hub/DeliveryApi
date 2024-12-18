@@ -15,7 +15,6 @@ namespace DTO
         [JsonPropertyName("password")]
         public string Password { get; set; }
     }
-
     public class RefreshCredentialsDto
     {
         [JsonPropertyName("refreshToken")]

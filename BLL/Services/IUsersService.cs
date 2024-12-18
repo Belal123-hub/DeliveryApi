@@ -9,6 +9,7 @@ namespace BLL.Services
     public interface IUsersService
     {
         Task Register(UserCreateDto model);
+        Task<LoginResponseDto> Login(LoginCredentialsDto model);
     }
     public class UsersService : IUsersService
     {
@@ -41,6 +42,32 @@ namespace BLL.Services
             {
                 throw new Exception($"Some errors during creating user! Data: {result.Errors}");
             }
+        }
+
+        public async Task<LoginResponseDto> Login(LoginCredentialsDto model) 
+        {
+            var user = await ValidateUser(model);
+            var result = new LoginResponseDto
+            {
+                // here we should implement accesstoken and refreshtoken
+            };
+            return result;
+        }
+
+        private async Task<User> ValidateUser(LoginCredentialsDto credentials)
+        {
+            var identityUser = await _userManager.FindByEmailAsync(credentials.Email);
+            if (identityUser != null)
+            {
+                var result = _userManager.PasswordHasher.VerifyHashedPassword(identityUser, identityUser.PasswordHash,
+                    credentials.Password);
+                if (result == PasswordVerificationResult.Success)
+                {
+                    return identityUser;
+                }
+            }
+
+            throw new ArgumentException("Login data was incorrect");
         }
 
     }

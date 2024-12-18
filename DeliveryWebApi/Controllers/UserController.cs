@@ -35,6 +35,23 @@ namespace Backend2024ExampleApp.Controllers
 
             return Ok();
         }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginCredentialsDto model)
+        {
+            try
+            {
+                return Ok(await _usersService.Login(model));
+            }
+            catch (ArgumentException ex) 
+            {
+                return BadRequest("Login or maybe password invalid!");
+            }
+            catch(Exception ex)
+            {
+                return Problem();
+            }
+        }
     }
 }
 
