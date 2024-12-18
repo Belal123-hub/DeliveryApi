@@ -894,8 +894,11 @@
       "System.Threading.Channels/7.0.0": {},
       "BLL/1.0.0": {
         "dependencies": {
+          "AutoMapper": "13.0.1",
           "DAL": "1.0.0",
-          "DTO": "1.0.0"
+          "DTO": "1.0.0",
+          "Quartz": "3.13.0",
+          "System.IdentityModel.Tokens.Jwt": "7.1.2"
         },
         "runtime": {
           "BLL.dll": {

@@ -1,7 +1,13 @@
-﻿using DAL.Data;
+﻿using BLL.Configuration;
+using DAL.Configurations;
+using DAL.Data;
 using DTO;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 
 namespace BLL.Services
@@ -14,12 +20,14 @@ namespace BLL.Services
     public class UsersService : IUsersService
     {
         private readonly UserManager<User> _userManager;
+        private readonly JwtBearerTokenSettings _jwtTokenSettings;
         private readonly ApplicationDbContext _context;
 
-        public UsersService(UserManager<User> userManager, ApplicationDbContext context )
+        public UsersService(UserManager<User> userManager,IOptions<JwtBearerTokenSettings> options, ApplicationDbContext context )
         {
             _userManager = userManager;
             _context = context;
+            _jwtTokenSettings = options.Value;
         }
         public async Task Register(UserCreateDto model)
         {
@@ -49,7 +57,7 @@ namespace BLL.Services
             var user = await ValidateUser(model);
             var result = new LoginResponseDto
             {
-                // here we should implement accesstoken and refreshtoken
+                AcessToken = await GenerateAccessToken(user)
             };
             return result;
         }
@@ -68,6 +76,33 @@ namespace BLL.Services
             }
 
             throw new ArgumentException("Login data was incorrect");
+        }
+
+        private async Task<string> GenerateAccessToken(User user)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_jwtTokenSettings.secretKey);
+
+            var isAdmin = await _userManager.IsInRoleAsync(user, ApplicationRoleNames.Administrator);
+
+            var descriptior = new SecurityTokenDescriptor
+            {
+                Audience = _jwtTokenSettings.Audience,
+                Issuer = _jwtTokenSettings.Issuer,
+                Expires = DateTime.UtcNow.AddSeconds(_jwtTokenSettings.AccessTokenExpiryTimeInSeconds),
+                Subject = new ClaimsIdentity(new List<Claim>
+                {
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Name, user.Name),
+                    new Claim("Id", user.Id.ToString()),
+                    new Claim(ClaimTypes.Role, isAdmin ? ApplicationRoleNames.Administrator : ApplicationRoleNames.User),
+                }),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(descriptior);
+            var userToken = tokenHandler.WriteToken(token);
+            return userToken;
         }
 
     }
