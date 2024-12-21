@@ -3,6 +3,7 @@ using DAL.Configurations;
 using DAL.Data;
 using DTO;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,6 +17,7 @@ namespace BLL.Services
     {
         Task Register(UserCreateDto model);
         Task<LoginResponseDto> Login(LoginCredentialsDto model);
+        Task<LoginResponseDto> Refresh(string refreshToken);
     }
     public class UsersService : IUsersService
     {
@@ -57,7 +59,8 @@ namespace BLL.Services
             var user = await ValidateUser(model);
             var result = new LoginResponseDto
             {
-                AcessToken = await GenerateAccessToken(user)
+                AccessToken = await GenerateAccessToken(user),
+                RefreshToken = await GenerateRefreshToken(user)
             };
             return result;
         }
@@ -104,6 +107,47 @@ namespace BLL.Services
             var userToken = tokenHandler.WriteToken(token);
             return userToken;
         }
+
+        public async Task<LoginResponseDto> Refresh(string refreshToken)
+        {
+            var storedToken = await _context.UserRefreshTokens
+                .FirstOrDefaultAsync(x => x.Token == refreshToken && x.ExpiryDateTime > DateTime.UtcNow);
+
+            if (storedToken == null)
+                throw new SecurityTokenException("Invalid or expired refresh token");
+
+            var user = await _userManager.FindByIdAsync(storedToken.UserId.ToString());
+            if (user == null)
+                throw new KeyNotFoundException($"User with id = {storedToken.UserId} does not found!");
+
+            storedToken.ExpiryDateTime = DateTime.UtcNow.AddMinutes(-5);
+            await _context.SaveChangesAsync();
+
+            return new LoginResponseDto()
+            {
+                AccessToken = await GenerateAccessToken(user),
+                RefreshToken = await GenerateRefreshToken(user)
+            };
+        }
+
+        private async Task<string> GenerateRefreshToken(User user)
+        {
+            var refreshToken = Guid.NewGuid();
+            var refreshTokenString = Convert.ToBase64String(refreshToken.ToByteArray());
+
+            var userRefreshToken = new UserRefreshToken
+            {
+                UserId = user.Id,
+                Token = refreshTokenString,
+                ExpiryDateTime = DateTime.UtcNow.AddDays(_jwtTokenSettings.RefreshTokenExpiryTimeInDays)
+            };
+
+            _context.UserRefreshTokens.Add(userRefreshToken);
+            await _context.SaveChangesAsync();
+            return refreshTokenString;
+        }
+
+
 
     }
 }

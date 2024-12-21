@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using BLL.Services;
 using DTO;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Backend2024ExampleApp.Controllers
 {
@@ -48,6 +49,27 @@ namespace Backend2024ExampleApp.Controllers
                 return BadRequest("Login or maybe password invalid!");
             }
             catch(Exception ex)
+            {
+                return Problem();
+            }
+        }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshCredentialsDto model)
+        {
+            try
+            {
+                return Ok(await _usersService.Refresh(model.RefreshToken));
+            }
+            catch (SecurityTokenException  ex)
+            {
+                return Unauthorized("Token is expired!");
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound("User is not found!");
+            }
+            catch (Exception ex)
             {
                 return Problem();
             }
