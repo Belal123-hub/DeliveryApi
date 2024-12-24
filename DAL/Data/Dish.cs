@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DAL.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,7 @@ namespace DAL.Data
 
         public int Id { get; set; }
 
-        public int Price { get; set; }
+        public Double Price { get; set; }
 
         public string Description { get; set; }
 
@@ -22,6 +23,6 @@ namespace DAL.Data
 
         public double Rating { get; set; }
 
-        //public Category category { get; set; }
+        public DishCategory Category { get; set; }
     }
 }

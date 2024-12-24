@@ -1,5 +1,6 @@
 ﻿using DAL.Data;
 using DTO;
+using DAL.Enums;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace BLL.Services
 {
     public interface IDishesService
     {
-        Task<DishPagedListDto> GetAllDishesAsync(int page, int size, bool? vegetarian);
+        Task<DishPagedListDto> GetAllDishesAsync(int page, int size, bool? vegetarian, DishCategory? category);
 
     }
     public class DishService : IDishesService
@@ -23,9 +24,13 @@ namespace BLL.Services
             _context = context;
         }
 
-        public async Task<DishPagedListDto> GetAllDishesAsync(int page, int size, bool? vegetarian)
+        public async Task<DishPagedListDto> GetAllDishesAsync(int page, int size, bool? vegetarian, DishCategory? category)
         {
             var query = _context.Dishes.AsQueryable();
+
+            // filter by category
+            if (category.HasValue)
+                query = query.Where(d => d.Category == category.Value);
 
             // filter by vegeterian 
             if (vegetarian.HasValue)

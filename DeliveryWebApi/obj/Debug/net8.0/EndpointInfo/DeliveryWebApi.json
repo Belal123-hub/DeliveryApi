@@ -35,6 +35,13 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DishCategory"
+            }
           }
         ],
         "responses": {
@@ -140,6 +147,16 @@
   },
   "components": {
     "schemas": {
+      "DishCategory": {
+        "enum": [
+          "Wok",
+          "Pizza",
+          "Soup",
+          "Dessert",
+          "Drink"
+        ],
+        "type": "string"
+      },
       "LoginCredentialsDto": {
         "type": "object",
         "properties": {
