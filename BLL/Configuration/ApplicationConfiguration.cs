@@ -11,6 +11,7 @@ namespace BLL.Configuration
         public static void ConfigureBll(this WebApplicationBuilder builder)
         {
             builder.Services.AddScoped<IUsersService, UsersService>();
+            builder.Services.AddScoped<IDishesService, DishService>();
         }
     }
 }
