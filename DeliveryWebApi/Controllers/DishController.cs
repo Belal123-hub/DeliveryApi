@@ -19,10 +19,11 @@ namespace DeliveryWebApi.Controllers
         public async Task<IActionResult> GetAllDishes(
      [FromQuery] int page = 1,
      [FromQuery] int size = 10,
+     [FromQuery] DishSorting? sorting = null,
      [FromQuery] bool? vegetarian = null,
      [FromQuery] DishCategory? category = null)
         {
-            var dishes = await _dishesService.GetAllDishesAsync(page, size, vegetarian,category);
+            var dishes = await _dishesService.GetAllDishesAsync(page, size, sorting, vegetarian,category);
             return Ok(dishes);
         }
 

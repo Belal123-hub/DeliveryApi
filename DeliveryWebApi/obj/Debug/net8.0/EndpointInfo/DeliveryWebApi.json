@@ -30,6 +30,13 @@
             }
           },
           {
+            "name": "sorting",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DishSorting"
+            }
+          },
+          {
             "name": "vegetarian",
             "in": "query",
             "schema": {
@@ -154,6 +161,17 @@
           "Soup",
           "Dessert",
           "Drink"
+        ],
+        "type": "string"
+      },
+      "DishSorting": {
+        "enum": [
+          "NameAsc",
+          "NameDesc",
+          "PriceAsc",
+          "PriceDesc",
+          "RatingAsc",
+          "RatingDesc"
         ],
         "type": "string"
       },

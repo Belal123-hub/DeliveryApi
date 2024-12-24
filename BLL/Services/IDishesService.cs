@@ -12,7 +12,7 @@ namespace BLL.Services
 {
     public interface IDishesService
     {
-        Task<DishPagedListDto> GetAllDishesAsync(int page, int size, bool? vegetarian, DishCategory? category);
+        Task<DishPagedListDto> GetAllDishesAsync(int page, int size, DishSorting? sorting, bool? vegetarian, DishCategory? category);
 
     }
     public class DishService : IDishesService
@@ -24,7 +24,7 @@ namespace BLL.Services
             _context = context;
         }
 
-        public async Task<DishPagedListDto> GetAllDishesAsync(int page, int size, bool? vegetarian, DishCategory? category)
+        public async Task<DishPagedListDto> GetAllDishesAsync(int page, int size, DishSorting? sorting, bool? vegetarian, DishCategory? category)
         {
             var query = _context.Dishes.AsQueryable();
 
@@ -36,6 +36,19 @@ namespace BLL.Services
             if (vegetarian.HasValue)
                 query = query.Where(d => d.IsVegetarian == vegetarian.Value);
 
+            // Apply sorting
+            query = sorting switch
+            {
+                DishSorting.NameAsc => query.OrderBy(d => d.Name),
+                DishSorting.NameDesc => query.OrderByDescending(d => d.Name),
+                DishSorting.PriceAsc => query.OrderBy(d => d.Price),
+                DishSorting.PriceDesc => query.OrderByDescending(d => d.Price),
+                DishSorting.RatingAsc => query.OrderBy(d => d.Rating),
+                DishSorting.RatingDesc => query.OrderByDescending(d => d.Rating),
+                _ => query
+            };
+
+            // Pagination
             var totalItems = await query.CountAsync();
             var dishes = await query.Skip((page - 1) * size).Take(size).ToListAsync();
 
