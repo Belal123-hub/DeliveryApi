@@ -15,11 +15,15 @@ namespace DeliveryWebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllDishes()
+        public async Task<IActionResult> GetAllDishes(
+     [FromQuery] int page = 1,
+     [FromQuery] int size = 10,
+     [FromQuery] bool? vegetarian = null)
         {
-            var dishes = await _dishesService.GetAllDishesAsync();
+            var dishes = await _dishesService.GetAllDishesAsync(page, size, vegetarian);
             return Ok(dishes);
         }
+
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using DAL.Data;
+using DTO;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -10,10 +11,10 @@ namespace BLL.Services
 {
     public interface IDishesService
     {
-        Task<IEnumerable<Dish>> GetAllDishesAsync();
-        
+        Task<DishPagedListDto> GetAllDishesAsync(int page, int size, bool? vegetarian);
+
     }
-    public class DishService : IDishesService 
+    public class DishService : IDishesService
     {
         private ApplicationDbContext _context;
 
@@ -22,10 +23,39 @@ namespace BLL.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<Dish>> GetAllDishesAsync()
+        public async Task<DishPagedListDto> GetAllDishesAsync(int page, int size, bool? vegetarian)
         {
-            return await _context.Dishes.ToListAsync();
+            var query = _context.Dishes.AsQueryable();
+
+            // filter by vegeterian 
+            if (vegetarian.HasValue)
+                query = query.Where(d => d.IsVegetarian == vegetarian.Value);
+
+            var totalItems = await query.CountAsync();
+            var dishes = await query.Skip((page - 1) * size).Take(size).ToListAsync();
+
+            var dishDtos = dishes.Select(d => new DishDto
+            {
+                Id = d.Id,
+                Name = d.Name,
+                Description = d.Description,
+                Price = d.Price,
+                Image = d.Image,
+                Vegetarian = d.IsVegetarian,
+                Rating = d.Rating,
+            }).ToList();
+
+            return new DishPagedListDto
+            {
+                Dishes = dishDtos,
+                Paginatin = new PageInfoModel
+                {
+                    Size = size,
+                    Count = totalItems,
+                    Current = page,
+                }
+            };
         }
+
     }
-     
 }
