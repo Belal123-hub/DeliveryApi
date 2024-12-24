@@ -13,6 +13,7 @@ namespace DAL.Data
         public override DbSet<User> Users { get; set; }
         public override DbSet<Role> Roles { get; set; }
         public DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
+        public DbSet<Dish> Dishes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -5,6 +5,18 @@
     "version": "1.0"
   },
   "paths": {
+    "/api/Dish": {
+      "get": {
+        "tags": [
+          "Dish"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/User/register": {
       "post": {
         "tags": [
