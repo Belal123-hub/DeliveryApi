@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DTO.Enums;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace DTO
 {
@@ -27,5 +24,6 @@ namespace DTO
 
         [Range(0, 5, ErrorMessage = "Rating must be between 0 and 5")]
         public double? Rating { get; set; } // Optional rating, ranges from 0 to 5
+        public DishCategory? Category { get; set; }
     }
 }

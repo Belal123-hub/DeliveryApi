@@ -1,18 +1,15 @@
 ﻿using DAL.Data;
 using DTO;
-using DAL.Enums;
+using DTO.Enums;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace BLL.Services
 {
     public interface IDishesService
     {
         Task<DishPagedListDto> GetAllDishesAsync(int page, int size, DishSorting? sorting, bool? vegetarian, DishCategory? category);
+        Task<DishDto?> GetDishByIdAsync(int id);
 
     }
     public class DishService : IDishesService
@@ -22,6 +19,25 @@ namespace BLL.Services
         public DishService(ApplicationDbContext context)
         {
             _context = context;
+        }
+        
+        public async Task<DishDto?> GetDishByIdAsync(int id) 
+        {
+            var dish = await _context.Dishes.FirstOrDefaultAsync(d => d.Id == id);
+            if (dish == null)
+                return null;
+
+            return new DishDto
+            {
+                Id = dish.Id,
+                Name = dish.Name,
+                Description = dish.Description,
+                Price = dish.Price,
+                Image = dish.Image,
+                Vegetarian = dish.IsVegetarian,
+                Rating = dish.Rating,
+                Category = (DTO.Enums.DishCategory?)dish.Category
+            };
         }
 
         public async Task<DishPagedListDto> GetAllDishesAsync(int page, int size, DishSorting? sorting, bool? vegetarian, DishCategory? category)

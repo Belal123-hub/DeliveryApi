@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace DAL.Enums
+namespace DTO.Enums
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum DishSorting

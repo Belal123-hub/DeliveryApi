@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241224170618_AddDish")]
-    partial class AddDish
+    [Migration("20241230081831_InitialMigrationDishById")]
+    partial class InitialMigrationDishById
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,7 +33,7 @@ namespace DAL.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Category")
+                    b.Property<int?>("Category")
                         .HasColumnType("integer");
 
                     b.Property<string>("Description")

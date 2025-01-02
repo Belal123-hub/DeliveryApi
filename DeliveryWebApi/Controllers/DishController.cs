@@ -1,5 +1,5 @@
 ﻿using BLL.Services;
-using DAL.Enums;
+using DTO.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DeliveryWebApi.Controllers
@@ -13,6 +13,16 @@ namespace DeliveryWebApi.Controllers
         public DishController(IDishesService dishesService)
         {
             _dishesService = dishesService;
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetDishById(int id) 
+        {
+            var dish = await _dishesService.GetDishByIdAsync(id);
+            if (dish == null) 
+                return NotFound(new { Message = "Dish not found" });
+
+            return Ok(dish);
         }
 
         [HttpGet]

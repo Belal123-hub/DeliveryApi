@@ -120,7 +120,11 @@
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
-            "projectReferences": {}
+            "projectReferences": {
+              "C:\\Users\\Belal\\Desktop\\en-backend-backend-24-1\\DTO\\DTO.csproj": {
+                "projectPath": "C:\\Users\\Belal\\Desktop\\en-backend-backend-24-1\\DTO\\DTO.csproj"
+              }
+            }
           }
         },
         "warningProperties": {

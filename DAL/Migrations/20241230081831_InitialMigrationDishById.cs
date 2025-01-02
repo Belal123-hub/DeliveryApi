@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class AddDish : Migration
+    public partial class InitialMigrationDishById : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -72,7 +72,7 @@ namespace DAL.Migrations
                     IsVegetarian = table.Column<bool>(type: "boolean", nullable: false),
                     Image = table.Column<string>(type: "text", nullable: false),
                     Rating = table.Column<double>(type: "double precision", nullable: false),
-                    Category = table.Column<int>(type: "integer", nullable: false)
+                    Category = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {

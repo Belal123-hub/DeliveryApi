@@ -351,6 +351,16 @@
             "related": ".xml"
           }
         }
+      },
+      "DTO/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v8.0",
+        "compile": {
+          "bin/placeholder/DTO.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/DTO.dll": {}
+        }
       }
     }
   },
@@ -880,10 +890,16 @@
         "npgsql.entityframeworkcore.postgresql.nuspec",
         "postgresql.png"
       ]
+    },
+    "DTO/1.0.0": {
+      "type": "project",
+      "path": "../DTO/DTO.csproj",
+      "msbuildProject": "../DTO/DTO.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net8.0": [
+      "DTO >= 1.0.0",
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 8.0.8",
       "Microsoft.EntityFrameworkCore >= 8.0.8",
       "Npgsql.EntityFrameworkCore.PostgreSQL >= 8.0.4"
@@ -920,7 +936,11 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\Belal\\Desktop\\en-backend-backend-24-1\\DTO\\DTO.csproj": {
+              "projectPath": "C:\\Users\\Belal\\Desktop\\en-backend-backend-24-1\\DTO\\DTO.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
