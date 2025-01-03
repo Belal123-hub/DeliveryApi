@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigrationDishById : Migration
+    public partial class InitialMigrationWithUserAndDishCreated : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -66,17 +66,35 @@ namespace DAL.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CreateDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ModifyDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeleteDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Price = table.Column<double>(type: "double precision", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
                     IsVegetarian = table.Column<bool>(type: "boolean", nullable: false),
                     Image = table.Column<string>(type: "text", nullable: false),
                     Rating = table.Column<double>(type: "double precision", nullable: false),
-                    Category = table.Column<int>(type: "integer", nullable: true)
+                    Category = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Dishes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LogoutUsers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreateDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ModifyDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DeleteDateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Identifier = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LogoutUsers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -260,6 +278,9 @@ namespace DAL.Migrations
 
             migrationBuilder.DropTable(
                 name: "Dishes");
+
+            migrationBuilder.DropTable(
+                name: "LogoutUsers");
 
             migrationBuilder.DropTable(
                 name: "UserRefreshTokens");

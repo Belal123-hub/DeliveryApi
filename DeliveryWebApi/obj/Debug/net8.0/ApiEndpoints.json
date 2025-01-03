@@ -69,6 +69,16 @@
   },
   {
     "ContainingType": "Backend2024ExampleApp.Controllers.UserController",
+    "Method": "Logout",
+    "RelativePath": "api/User/logout",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Backend2024ExampleApp.Controllers.UserController",
     "Method": "Refresh",
     "RelativePath": "api/User/refresh",
     "HttpMethod": "POST",

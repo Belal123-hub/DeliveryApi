@@ -9,6 +9,9 @@ namespace DAL.Data
 {
     public class Dish
     {
+        public DateTime CreateDateTime { get; set; }
+        public DateTime ModifyDateTime { get; set; }
+        public DateTime? DeleteDateTime { get; set; }
         public string Name { get; set; }
 
         public int Id { get; set; }

@@ -37,6 +37,5 @@ namespace DeliveryWebApi.Controllers
             return Ok(dishes);
         }
 
-
     }
 }

@@ -2,6 +2,7 @@
 using BLL.Services;
 using DTO;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend2024ExampleApp.Controllers
 {
@@ -9,7 +10,9 @@ namespace Backend2024ExampleApp.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
+        private readonly ILogger<UserController> _logger;
         private readonly IUsersService _usersService;
+        private readonly ITokenService _tokenService;
         public UserController(IUsersService usersService) { 
             this._usersService = usersService;
         }
@@ -74,6 +77,36 @@ namespace Backend2024ExampleApp.Controllers
                 return Problem();
             }
         }
+
+        [HttpPost("logout")]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                var userIdClaim = User.Claims.FirstOrDefault(x => x.Type == "Id");
+                if (userIdClaim == null)
+                {
+                    _logger.LogWarning("Logout attempted without a valid user ID claim.");
+                    return BadRequest("User ID claim not found.");
+                }
+
+                await _tokenService.Logout(Guid.Parse(userIdClaim.Value));
+                _logger.LogInformation($"User {userIdClaim.Value} successfully logged out.");
+                return Ok(new { Message = "Logout successful." });
+            }
+            catch (FormatException ex)
+            {
+                _logger.LogError(ex, "Invalid user ID format in Logout endpoint.");
+                return BadRequest("Invalid user ID format.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while logging out.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request.");
+            }
+        }
+
     }
 }
 
