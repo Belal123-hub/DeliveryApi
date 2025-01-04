@@ -3,6 +3,7 @@ using BLL.Services;
 using DTO;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace Backend2024ExampleApp.Controllers
 {
@@ -105,6 +106,14 @@ namespace Backend2024ExampleApp.Controllers
                 _logger.LogError(ex, "An unexpected error occurred while logging out.");
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing your request.");
             }
+        }
+
+        [Authorize]
+        [HttpGet("Profile")]
+        public async Task<IActionResult> Profile()
+        {
+            var emailClaim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email);
+            return Ok(await _usersService.GetProfile(emailClaim.Value));
         }
 
     }

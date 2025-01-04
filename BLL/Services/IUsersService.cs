@@ -18,6 +18,7 @@ namespace BLL.Services
         Task Register(UserCreateDto model);
         Task<LoginResponseDto> Login(LoginCredentialsDto model);
         Task<LoginResponseDto> Refresh(string refreshToken);
+        Task<UserPublicModelDto> GetProfile(string email);
     }
     public class UsersService : IUsersService
     {
@@ -127,6 +128,21 @@ namespace BLL.Services
             {
                 AccessToken = await GenerateAccessToken(user),
                 RefreshToken = await GenerateRefreshToken(user)
+            };
+        }
+
+        public async Task<UserPublicModelDto> GetProfile(string email) 
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                throw new KeyNotFoundException($"User with email = {email} does not exist!");
+            }
+            return new UserPublicModelDto
+            {
+                Name = user.Name,
+                Email = user.Email,
+                BirthDate = user.BirthDate,
             };
         }
 

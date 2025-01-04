@@ -79,6 +79,16 @@
   },
   {
     "ContainingType": "Backend2024ExampleApp.Controllers.UserController",
+    "Method": "Profile",
+    "RelativePath": "api/User/Profile",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Backend2024ExampleApp.Controllers.UserController",
     "Method": "Refresh",
     "RelativePath": "api/User/refresh",
     "HttpMethod": "POST",
