@@ -19,6 +19,7 @@ namespace BLL.Services
         Task<LoginResponseDto> Login(LoginCredentialsDto model);
         Task<LoginResponseDto> Refresh(string refreshToken);
         Task<UserPublicModelDto> GetProfile(string email);
+        Task UpdateProfile(string email, UserEditModelDto model);
     }
     public class UsersService : IUsersService
     {
@@ -144,6 +145,25 @@ namespace BLL.Services
                 Email = user.Email,
                 BirthDate = user.BirthDate,
             };
+        }
+
+        public async Task UpdateProfile(string email, UserEditModelDto model) 
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                throw new KeyNotFoundException($"User with email = {email} does not exist!");
+            }
+
+            user.Name = model.Name;
+            user.BirthDate = model.BirthDate;
+            user.SocialNumber = model.PhoneNumber;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                throw new Exception("Failed to update the profile.");
+            }
         }
 
         private async Task<string> GenerateRefreshToken(User user)
