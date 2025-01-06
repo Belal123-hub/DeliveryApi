@@ -79,8 +79,8 @@ namespace Backend2024ExampleApp.Controllers
             }
         }
 
-        [HttpPost("logout")]
         [Authorize]
+        [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
             try

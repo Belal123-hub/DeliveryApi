@@ -8,7 +8,7 @@ using DAL.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-
+using Microsoft.OpenApi.Models;
 
 namespace Backend2024ExampleApp
 {
@@ -18,16 +18,74 @@ namespace Backend2024ExampleApp
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            // Configure Services
+            ConfigureServices(builder);
 
+            var app = builder.Build();
+
+            // Apply Database Migrations
+            ApplyDatabaseMigrations(app);
+
+            // Configure Middlewares
+            ConfigureMiddlewares(app);
+
+            // Run the Application
+            await app.ConfigureIdentityAsync();
+            app.Run();
+        }
+
+        private static void ConfigureServices(WebApplicationBuilder builder)
+        {
+            // Add Controllers
+            builder.Services.AddControllers();
+
+            // Configure Swagger
+            ConfigureSwagger(builder);
+
+            // Configure Data Access Layer (DAL) and Business Logic Layer (BLL)
             builder.ConfigureDal();
             builder.ConfigureBll();
 
-            // Configure JWT
+            // Configure JWT Authentication
+            ConfigureJwtAuthentication(builder);
+
+            // Configure Authorization Policies
+            ConfigureAuthorization(builder);
+        }
+
+        private static void ConfigureSwagger(WebApplicationBuilder builder)
+        {
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Name = "Authorization",
+                    Description = "Bearer Authentication with JWT Token",
+                    Type = SecuritySchemeType.Http
+                });
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Id = "Bearer",
+                                Type = ReferenceType.SecurityScheme
+                            }
+                        },
+                        new List<string>()
+                    }
+                });
+            });
+        }
+
+        private static void ConfigureJwtAuthentication(WebApplicationBuilder builder)
+        {
             var jwtSection = builder.Configuration.GetSection("JwtBearerTokenSettings");
             builder.Services.Configure<JwtBearerTokenSettings>(jwtSection);
 
@@ -46,7 +104,6 @@ namespace Backend2024ExampleApp
                     ValidAudience = jwtConfiguration.Audience,
                     ValidIssuer = jwtConfiguration.Issuer,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
-
                     ValidateLifetime = true,
                     LifetimeValidator = (before, expires, token, parameters) =>
                     {
@@ -55,7 +112,10 @@ namespace Backend2024ExampleApp
                     }
                 };
             });
+        }
 
+        private static void ConfigureAuthorization(WebApplicationBuilder builder)
+        {
             builder.Services.AddAuthorization(options =>
             {
                 options.AddPolicy(ApplicationRoleNames.Administrator,
@@ -65,13 +125,17 @@ namespace Backend2024ExampleApp
                     .RequireClaim(ClaimTypes.Role, ApplicationRoleNames.Administrator)
                     .Build());
             });
+        }
 
-            var app = builder.Build();
-
+        private static void ApplyDatabaseMigrations(WebApplication app)
+        {
             using var serviceScope = app.Services.CreateScope();
             var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
             context.Database.Migrate();
-            // Configure the HTTP request pipeline.
+        }
+
+        private static void ConfigureMiddlewares(WebApplication app)
+        {
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -83,11 +147,7 @@ namespace Backend2024ExampleApp
             app.UseAuthentication();
             app.UseAuthorization();
 
-
-
             app.MapControllers();
-            await app.ConfigureIdentityAsync();
-            app.Run();
         }
     }
 }
