@@ -89,6 +89,22 @@
   },
   {
     "ContainingType": "Backend2024ExampleApp.Controllers.UserController",
+    "Method": "EditProfile",
+    "RelativePath": "api/User/Profile",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "model",
+        "Type": "DTO.UserEditModelDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Backend2024ExampleApp.Controllers.UserController",
     "Method": "Refresh",
     "RelativePath": "api/User/refresh",
     "HttpMethod": "POST",

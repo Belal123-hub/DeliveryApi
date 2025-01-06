@@ -79,8 +79,8 @@ namespace Backend2024ExampleApp.Controllers
             }
         }
 
-        [HttpPost("logout")]
         [Authorize]
+        [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
             try
@@ -114,6 +114,28 @@ namespace Backend2024ExampleApp.Controllers
         {
             var emailClaim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email);
             return Ok(await _usersService.GetProfile(emailClaim.Value));
+        }
+
+        [Authorize]
+        [HttpPut("Profile")]
+        public async Task<IActionResult> EditProfile([FromBody] UserEditModelDto model)
+        {
+            try
+            {
+                var emailClaim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email);
+                await _usersService.UpdateProfile(emailClaim.Value, model);
+                return Ok("Profile updated successfully.");
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogError(ex, "Error updating profile");
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error updating profile");
+                return Problem();
+            }
         }
 
     }
