@@ -8,7 +8,9 @@ namespace BLL.Services
       public interface IBasketService
     {
         Task<List<DishBasketDto>?> GetAllDishesInBasketAsync();
-        Task<bool> AddDishToBasketByIdAsync(int dishId);
+        Task<bool> AddDishToBasketByIdAsync(Guid dishId);
+        Task<bool> UpdateDishQuantityInBasketAsync(Guid dishId, bool increase);
+
 
     }
 
@@ -44,7 +46,7 @@ namespace BLL.Services
             return dishBasketDtos;
         }
 
-        public async Task<bool> AddDishToBasketByIdAsync(int dishId)
+        public async Task<bool> AddDishToBasketByIdAsync(Guid dishId)
         {
             // Get the dish from the database
             var dish = await _context.Dishes.FirstOrDefaultAsync(d => d.Id == dishId);
@@ -84,6 +86,55 @@ namespace BLL.Services
             await _context.SaveChangesAsync();
             return true; // Success
         }
+
+        public async Task<bool> UpdateDishQuantityInBasketAsync(Guid dishId, bool increase)
+        {
+            Console.WriteLine($"Attempting to update quantity for Dish with ID: {dishId}, Increase: {increase}");
+
+            // Attempt to find the dish
+            var dish = await _context.Baskets.FirstOrDefaultAsync(b => b.Id == dishId);
+
+            if (dish == null)
+            {
+                Console.WriteLine($"Dish with ID: {dishId} not found.");
+                return false; // Dish not found
+            }
+
+            // Update quantity based on increase flag
+            if (increase)
+            {
+                dish.Amount += 1;
+                Console.WriteLine($"Increased quantity for Dish: {dish.Name}. New Amount: {dish.Amount}");
+            }
+            else
+            {
+                dish.Amount -= 1;
+                Console.WriteLine($"Decreased quantity for Dish: {dish.Name}. New Amount: {dish.Amount}");
+
+                // Remove the dish if the quantity reaches zero
+                if (dish.Amount <= 0)
+                {
+                    Console.WriteLine($"Quantity for Dish: {dish.Name} is zero. Removing from basket.");
+                    _context.Baskets.Remove(dish);
+                }
+            }
+
+            // Save changes to the database
+            var result = await _context.SaveChangesAsync();
+
+            if (result > 0)
+            {
+                Console.WriteLine("Dish quantity updated successfully.");
+                return true;
+            }
+            else
+            {
+                Console.WriteLine("Failed to update dish quantity. SaveChangesAsync did not persist changes.");
+                return false;
+            }
+        }
+
+
     }
 }
 

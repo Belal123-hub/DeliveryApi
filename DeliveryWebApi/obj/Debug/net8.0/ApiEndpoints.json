@@ -31,6 +31,27 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "DeliveryWebApi.Controllers.BasketController",
+    "Method": "UpdateOrRemoveDishFromBasket",
+    "RelativePath": "api/Basket/Dish/{DishId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "DishId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "increase",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "DeliveryWebApi.Controllers.DishController",
     "Method": "GetAllDishes",
     "RelativePath": "api/Dish",
@@ -76,7 +97,7 @@
     "Parameters": [
       {
         "Name": "id",
-        "Type": "System.Int32",
+        "Type": "System.Guid",
         "IsRequired": true
       }
     ],

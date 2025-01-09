@@ -16,7 +16,7 @@ namespace DeliveryWebApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetDishById(int id) 
+        public async Task<IActionResult> GetDishById(Guid id) 
         {
             var dish = await _dishesService.GetDishByIdAsync(id);
             if (dish == null) 

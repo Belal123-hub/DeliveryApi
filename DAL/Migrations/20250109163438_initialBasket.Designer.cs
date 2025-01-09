@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250109061402_DishIdModifiedWithBasket")]
-    partial class DishIdModifiedWithBasket
+    [Migration("20250109163438_initialBasket")]
+    partial class initialBasket
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,8 +40,8 @@ namespace DAL.Migrations
                     b.Property<DateTime?>("DeleteDateTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("DishId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("DishId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Image")
                         .HasColumnType("text");
@@ -66,11 +66,9 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("DAL.Data.Dish", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Category")
                         .HasColumnType("integer");
@@ -86,7 +84,6 @@ namespace DAL.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Image")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("IsVegetarian")

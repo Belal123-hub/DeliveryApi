@@ -9,7 +9,7 @@ namespace BLL.Services
     public interface IDishesService
     {
         Task<DishPagedListDto> GetAllDishesAsync(int page, int size, DishSorting? sorting, bool? vegetarian, DishCategory? category);
-        Task<DishDto?> GetDishByIdAsync(int id);
+        Task<DishDto?> GetDishByIdAsync(Guid id);
 
     }
     public class DishService : IDishesService
@@ -21,7 +21,7 @@ namespace BLL.Services
             _context = context;
         }
         
-        public async Task<DishDto?> GetDishByIdAsync(int id) 
+        public async Task<DishDto?> GetDishByIdAsync(Guid id) 
         {
             var dish = await _context.Dishes.FirstOrDefaultAsync(d => d.Id == id);
             if (dish == null)

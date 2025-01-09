@@ -8,6 +8,6 @@ namespace DTO
 {
     public class AddDishToBasketRequest
     {
-        public int DishId { get; set; }
+        public Guid DishId { get; set; }
     }
 }

@@ -6,7 +6,7 @@ namespace DTO
 {
     public class DishDto
     {
-        public int Id { get; set; } // UUID for the dish
+        public Guid Id { get; set; } // UUID for the dish
 
         [Required]
         [MinLength(1)]
