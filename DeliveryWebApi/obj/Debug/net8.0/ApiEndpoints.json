@@ -10,6 +10,27 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "DeliveryWebApi.Controllers.BasketController",
+    "Method": "AddDishToBasket",
+    "RelativePath": "api/Basket/Dish/{DishById}",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "DTO.AddDishToBasketRequest",
+        "IsRequired": true
+      },
+      {
+        "Name": "DishById",
+        "Type": "",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "DeliveryWebApi.Controllers.DishController",
     "Method": "GetAllDishes",
     "RelativePath": "api/Dish",

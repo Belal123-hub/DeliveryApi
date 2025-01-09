@@ -17,6 +17,47 @@
         }
       }
     },
+    "/api/Basket/Dish/{DishById}": {
+      "post": {
+        "tags": [
+          "Basket"
+        ],
+        "parameters": [
+          {
+            "name": "DishById",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddDishToBasketRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddDishToBasketRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddDishToBasketRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Dish/{id}": {
       "get": {
         "tags": [
@@ -242,6 +283,16 @@
   },
   "components": {
     "schemas": {
+      "AddDishToBasketRequest": {
+        "type": "object",
+        "properties": {
+          "dishId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "DishCategory": {
         "enum": [
           "Wok",

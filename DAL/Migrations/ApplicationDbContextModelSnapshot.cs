@@ -37,6 +37,9 @@ namespace DAL.Migrations
                     b.Property<DateTime?>("DeleteDateTime")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("DishId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Image")
                         .HasColumnType("text");
 
@@ -80,7 +83,6 @@ namespace DAL.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Image")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("IsVegetarian")

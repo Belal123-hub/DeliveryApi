@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250109035205_AddBasketMigration")]
-    partial class AddBasketMigration
+    [Migration("20250109061806_NullableImageInDish")]
+    partial class NullableImageInDish
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,6 +39,9 @@ namespace DAL.Migrations
 
                     b.Property<DateTime?>("DeleteDateTime")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("DishId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Image")
                         .HasColumnType("text");
@@ -83,7 +86,6 @@ namespace DAL.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Image")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("IsVegetarian")
