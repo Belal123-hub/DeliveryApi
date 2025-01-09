@@ -5,6 +5,18 @@
     "version": "1.0"
   },
   "paths": {
+    "/api/Basket": {
+      "get": {
+        "tags": [
+          "Basket"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Dish/{id}": {
       "get": {
         "tags": [

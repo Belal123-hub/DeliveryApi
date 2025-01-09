@@ -15,6 +15,7 @@ namespace DAL.Data
         public DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
         public DbSet<LogoutUser> LogoutUsers { get; set; }
         public DbSet<Dish> Dishes { get; set; }
+        public DbSet<Basket> Baskets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
