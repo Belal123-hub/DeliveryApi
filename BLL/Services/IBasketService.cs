@@ -12,6 +12,7 @@ namespace BLL.Services
         Task<List<DishBasketDto>?> GetAllDishesInBasketAsync(Guid userId);
         Task<DishBasketDto?> AddDishToBasketAsync(Guid userId, Guid dishId);
         Task<bool> UpdateDishQuantityInBasketAsync(Guid dishId, bool increase);
+        Task<bool> ClearBasketAsync(Guid userId);
     }
 
     public class BasketService : IBasketService
@@ -144,6 +145,40 @@ namespace BLL.Services
             {
                 _logger.LogWarning("Failed to update dish quantity. SaveChangesAsync did not persist changes.");
                 return false;
+            }
+        }
+
+        public async Task<bool> ClearBasketAsync(Guid userId)
+        {
+            try
+            {
+                _logger.LogInformation($"Clearing basket for user: {userId}");
+
+                var basket = await _context.Baskets
+                    .Include(b => b.Items)
+                    .FirstOrDefaultAsync(b => b.UserId == userId && b.DeleteDateTime == null);
+
+                if (basket == null)
+                {
+                    _logger.LogWarning($"No basket found for user: {userId}");
+                    return false;
+                }
+
+                // Mark the basket as deleted
+                basket.DeleteDateTime = DateTime.UtcNow;
+
+                // Remove all items from the basket
+                _context.BasketItems.RemoveRange(basket.Items);
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation($"Basket cleared successfully for user: {userId}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while clearing the basket for user: {userId}");
+                throw;
             }
         }
     }
