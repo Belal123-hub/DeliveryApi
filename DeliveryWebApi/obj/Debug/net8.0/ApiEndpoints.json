@@ -1,6 +1,6 @@
 [
   {
-    "ContainingType": "DeliveryWebApi.Controllers.BasketController",
+    "ContainingType": "API.Controllers.BasketController",
     "Method": "GetAllDishesInBasket",
     "RelativePath": "api/Basket",
     "HttpMethod": "GET",
@@ -10,7 +10,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "DeliveryWebApi.Controllers.BasketController",
+    "ContainingType": "API.Controllers.BasketController",
     "Method": "AddDishToBasket",
     "RelativePath": "api/Basket/Dish/{DishById}",
     "HttpMethod": "POST",
@@ -18,8 +18,8 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "request",
-        "Type": "DTO.AddDishToBasketRequest",
+        "Name": "addDishToBasketDto",
+        "Type": "DTO.AddDishToBasketDto",
         "IsRequired": true
       },
       {
@@ -31,7 +31,7 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "DeliveryWebApi.Controllers.BasketController",
+    "ContainingType": "API.Controllers.BasketController",
     "Method": "UpdateOrRemoveDishFromBasket",
     "RelativePath": "api/Basket/Dish/{DishId}",
     "HttpMethod": "DELETE",

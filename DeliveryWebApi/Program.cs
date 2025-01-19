@@ -45,7 +45,7 @@ namespace Backend2024ExampleApp
             // Configure Data Access Layer (DAL) and Business Logic Layer (BLL)
             builder.ConfigureDal();
             builder.ConfigureBll();
-
+            builder.Services.AddLogging();
             // Configure JWT Authentication
             ConfigureJwtAuthentication(builder);
 

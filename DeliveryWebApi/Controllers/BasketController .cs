@@ -1,27 +1,39 @@
-﻿using BLL.Services;
+﻿using Backend2024ExampleApp.Controllers;
+using BLL.Services;
 using DTO;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
-namespace DeliveryWebApi.Controllers
+namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class BasketController : ControllerBase
     {
+        private readonly ILogger<BasketController> _logger;
+
         private readonly IBasketService _basketService;
 
-        public BasketController(IBasketService basketService)
+        public BasketController(IBasketService basketService, ILogger<BasketController> logger)
         {
             _basketService = basketService;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger)); // Check for null logger
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllDishesInBasket()
         {
-            var cart = await _basketService.GetAllDishesInBasketAsync();
+            // Extract the userId from the authenticated user's claims
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+            {
+                return Unauthorized(new { Message = "Invalid or missing user ID" });
+            }
+
+            var cart = await _basketService.GetAllDishesInBasketAsync(userId);
 
             if (cart == null || !cart.Any())
                 return NotFound(new { Message = "No dishes in the basket" });
@@ -29,46 +41,48 @@ namespace DeliveryWebApi.Controllers
             return Ok(cart);
         }
 
+        [Authorize]
         [HttpPost("Dish/{DishById}")]
-        public async Task<IActionResult> AddDishToBasket([FromBody] AddDishToBasketRequest request)
+        public async Task<IActionResult> AddDishToBasket([FromBody] AddDishToBasketDto addDishToBasketDto)
         {
-            if (request == null)
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
+
+            if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
             {
-                return BadRequest(new { Message = "Invalid DishId" });
+                return Unauthorized(new { Message = "Invalid or missing user ID" });
             }
 
-            var success = await _basketService.AddDishToBasketByIdAsync(request.DishId);
+            var result = await _basketService.AddDishToBasketAsync(Guid.Parse(userIdClaim), addDishToBasketDto.DishId);
 
-            if (success)
-            {
-                return Ok(new { Message = "Dish added to basket successfully" });
-            }
-            else
-            {
-                return NotFound(new { Message = "Dish not found" });
-            }
+            if (result == null)
+                return BadRequest(new { Message = "Failed to add dish to basket" });
+
+            return Ok("Success");
         }
 
+
+        // DELETE: api/Basket/Clear
+        [Authorize]
         [HttpDelete("Dish/{DishId}")]
         public async Task<IActionResult> UpdateOrRemoveDishFromBasket(Guid DishId, [FromQuery] bool increase)
         {
             if (DishId == Guid.Empty)
             {
-                Console.WriteLine("Invalid DishId provided.");
+                _logger.LogWarning("Invalid DishId provided.");
                 return BadRequest(new { Message = "Invalid DishId" });
             }
 
-            Console.WriteLine($"Received request to update Dish with ID: {DishId}. Increase: {increase}");
+            _logger.LogInformation($"Received request to update Dish with ID: {DishId}. Increase: {increase}");
             var success = await _basketService.UpdateDishQuantityInBasketAsync(DishId, increase);
 
             if (success)
             {
-                Console.WriteLine("Dish updated successfully.");
-                return Ok(new { Message = "Dish updated successfully" });
+                _logger.LogInformation("Dish updated successfully.");
+                return Ok(new { Message = "Success" });
             }
             else
             {
-                Console.WriteLine("Dish not found or could not be updated.");
+                _logger.LogWarning("Dish not found or could not be updated.");
                 return NotFound(new { Message = "Dish not found or could not be updated" });
             }
         }

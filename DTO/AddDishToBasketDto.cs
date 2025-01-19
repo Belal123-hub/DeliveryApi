@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace DTO
 {
-    public class AddDishToBasketRequest
-    {
-        public Guid DishId { get; set; }
+    public class AddDishToBasketDto
+    {        public Guid DishId { get; set; }
     }
 }

@@ -36,17 +36,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AddDishToBasketRequest"
+                "$ref": "#/components/schemas/AddDishToBasketDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/AddDishToBasketRequest"
+                "$ref": "#/components/schemas/AddDishToBasketDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/AddDishToBasketRequest"
+                "$ref": "#/components/schemas/AddDishToBasketDto"
               }
             }
           }
@@ -313,7 +313,7 @@
   },
   "components": {
     "schemas": {
-      "AddDishToBasketRequest": {
+      "AddDishToBasketDto": {
         "type": "object",
         "properties": {
           "dishId": {
