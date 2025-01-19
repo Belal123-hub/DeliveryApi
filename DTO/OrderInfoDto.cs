@@ -5,18 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DAL.Data
+namespace DTO
 {
-    public class Order
+    public class OrderInfoDto
     {
         public Guid Id { get; set; }
-        public Guid UserId { get; set; }
-
         public DateTime DeliveryTime { get; set; }
         public DateTime OrderTime { get; set; }
         public OrderStatus Status { get; set; }
         public decimal Price { get; set; }
-        public string Address { get; set; }
-        public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
     }
 }

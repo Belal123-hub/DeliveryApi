@@ -13,7 +13,7 @@ namespace DAL.Data
 
         public Guid Id { get; set; }
 
-        public Double Price { get; set; }
+        public Decimal Price { get; set; }
 
         public string Description { get; set; }
 

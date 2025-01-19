@@ -29,13 +29,15 @@ namespace BLL.Services
 
         public async Task<List<DishBasketDto>?> GetAllDishesInBasketAsync(Guid userId)
         {
+            // Fetch the user's active basket (where DeleteDateTime is null)
             var basket = await _context.Baskets
                 .Include(b => b.Items)
-                .FirstOrDefaultAsync(b => b.UserId == userId);
+                .FirstOrDefaultAsync(b => b.UserId == userId && b.DeleteDateTime == null);
 
             if (basket == null || !basket.Items.Any())
                 return null;
 
+            // Map the basket items to DishBasketDto
             var dishBasketDtos = basket.Items.Select(item => new DishBasketDto
             {
                 Id = item.DishId,
@@ -52,11 +54,14 @@ namespace BLL.Services
         public async Task<DishBasketDto?> AddDishToBasketAsync(Guid userId, Guid dishId)
         {
             var dish = await _context.Dishes.FirstOrDefaultAsync(d => d.Id == dishId);
+
+            // Fetch the user's active basket (where DeleteDateTime is null)
             var basket = await _context.Baskets
                 .FirstOrDefaultAsync(b => b.UserId == userId && b.DeleteDateTime == null);
 
             if (basket == null)
             {
+                // Create a new basket if none exists
                 basket = new Basket
                 {
                     UserId = userId,
@@ -67,6 +72,7 @@ namespace BLL.Services
                 await _context.SaveChangesAsync();
             }
 
+            // Add the dish to the basket
             var existingBasketItem = basket.Items
                 .FirstOrDefault(item => item.DishId == dishId);
 
@@ -154,25 +160,35 @@ namespace BLL.Services
             {
                 _logger.LogInformation($"Clearing basket for user: {userId}");
 
+                // Fetch the user's current active basket
                 var basket = await _context.Baskets
                     .Include(b => b.Items)
                     .FirstOrDefaultAsync(b => b.UserId == userId && b.DeleteDateTime == null);
 
                 if (basket == null)
                 {
-                    _logger.LogWarning($"No basket found for user: {userId}");
+                    _logger.LogWarning($"No active basket found for user: {userId}");
                     return false;
                 }
 
-                // Mark the basket as deleted
+                // Mark the current basket as deleted
                 basket.DeleteDateTime = DateTime.UtcNow;
 
                 // Remove all items from the basket
                 _context.BasketItems.RemoveRange(basket.Items);
 
+                // Create a new basket for the user
+                var newBasket = new Basket
+                {
+                    UserId = userId,
+                    CreateDateTime = DateTime.UtcNow,
+                    ModifyDateTime = DateTime.UtcNow
+                };
+                _context.Baskets.Add(newBasket);
+
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation($"Basket cleared successfully for user: {userId}");
+                _logger.LogInformation($"Basket cleared and new basket created successfully for user: {userId}");
                 return true;
             }
             catch (Exception ex)
