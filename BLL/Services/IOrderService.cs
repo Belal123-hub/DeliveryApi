@@ -15,6 +15,7 @@ namespace BLL.Services
     {
         Task<IEnumerable<OrderInfoDto>> GetOrdersAsync();
         Task<OrderDto?> CreateOrderFromBasketAsync(Guid userId, OrderCreateDto orderCreateDto);
+        Task<OrderDto?> GetOrderByIdAsync(Guid orderId);
 
     }
 
@@ -27,6 +28,50 @@ namespace BLL.Services
         {
             _logger = logger;
             _context = context;
+        }
+
+        public async Task<OrderDto?> GetOrderByIdAsync(Guid orderId)
+        {
+            try
+            {
+                _logger.LogInformation($"Fetching order with ID: {orderId}");
+
+                // Fetch the order from the database
+                var order = await _context.Orders
+                    .Include(o => o.Items) // Include related items
+                    .FirstOrDefaultAsync(o => o.Id == orderId);
+
+                if (order == null)
+                {
+                    _logger.LogWarning($"Order with ID: {orderId} not found.");
+                    return null;
+                }
+
+                // Map the order to OrderDto
+                return new OrderDto
+                {
+                    Id = order.Id.ToString(),
+                    DeliveryTime = order.DeliveryTime.ToString("o"), // ISO 8601 format
+                    OrderTime = order.OrderTime.ToString("o"), // ISO 8601 format
+                    Status = order.Status,
+                    Price = (double)order.Price,
+                    Address = order.Address,
+                    Dishes = order.Items.Select(item => new DishBasketDto
+                    {
+                        Id = item.DishId,
+                        Name = item.Name,
+                        Price = item.Price,
+                        TotalPrice = (item.Price * item.Amount),
+                        Amount = item.Amount,
+                        Image = item.Image
+                    }).ToList()
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while fetching order with ID: {orderId}");
+                throw;
+            }
         }
 
         public async Task<IEnumerable<OrderInfoDto>> GetOrdersAsync()

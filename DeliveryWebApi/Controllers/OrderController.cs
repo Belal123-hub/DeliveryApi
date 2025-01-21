@@ -24,6 +24,32 @@ namespace DeliveryWebApi.Controllers
             _logger = logger;
         }
 
+        [HttpGet("{orderId}")]
+        public async Task<IActionResult> GetOrderById(Guid orderId)
+        {
+            try
+            {
+                _logger.LogInformation($"Fetching order with ID: {orderId}");
+
+                // Fetch the order by ID
+                var order = await _orderService.GetOrderByIdAsync(orderId);
+
+                if (order == null)
+                {
+                    _logger.LogWarning($"Order with ID: {orderId} not found.");
+                    return NotFound(new { Message = "Order not found" });
+                }
+
+                _logger.LogInformation($"Successfully fetched order with ID: {orderId}");
+                return Ok(order);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while fetching order with ID: {orderId}");
+                return StatusCode(500, new { Message = "Internal server error" });
+            }
+        }
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderInfoDto>>> GetOrders()
         {
