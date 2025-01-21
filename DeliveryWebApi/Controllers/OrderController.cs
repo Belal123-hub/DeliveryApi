@@ -3,6 +3,7 @@ using DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,6 +12,10 @@ namespace DeliveryWebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [SwaggerResponse(StatusCodes.Status401Unauthorized, "Unauthorized.")]
+    [SwaggerResponse(StatusCodes.Status403Forbidden, "Forbidden.")]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "Not found.")]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "InternalServerError.", typeof(Response))]
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
@@ -25,58 +30,45 @@ namespace DeliveryWebApi.Controllers
         }
 
         [HttpGet("{orderId}")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Success.", typeof(OrderDto))]
         public async Task<IActionResult> GetOrderById(Guid orderId)
         {
-            try
+            _logger.LogInformation($"Fetching order with ID: {orderId}");
+
+            // Fetch the order by ID
+            var order = await _orderService.GetOrderByIdAsync(orderId);
+
+            if (order == null)
             {
-                _logger.LogInformation($"Fetching order with ID: {orderId}");
-
-                // Fetch the order by ID
-                var order = await _orderService.GetOrderByIdAsync(orderId);
-
-                if (order == null)
-                {
-                    _logger.LogWarning($"Order with ID: {orderId} not found.");
-                    return NotFound(new { Message = "Order not found" });
-                }
-
-                _logger.LogInformation($"Successfully fetched order with ID: {orderId}");
-                return Ok(order);
+                _logger.LogWarning($"Order with ID: {orderId} not found.");
+                return NotFound(new { Message = "Order not found" });
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"An error occurred while fetching order with ID: {orderId}");
-                return StatusCode(500, new { Message = "Internal server error" });
-            }
+
+            _logger.LogInformation($"Successfully fetched order with ID: {orderId}");
+            return Ok(order);
         }
 
         [HttpGet]
+        [SwaggerResponse(StatusCodes.Status200OK, "Success.", typeof(IEnumerable<OrderInfoDto>))]
         public async Task<ActionResult<IEnumerable<OrderInfoDto>>> GetOrders()
         {
-            try
+            _logger.LogInformation("Fetching all orders.");
+
+            var orders = await _orderService.GetOrdersAsync();
+
+            if (orders == null || !orders.Any())
             {
-                _logger.LogInformation("Fetching all orders.");
-
-                var orders = await _orderService.GetOrdersAsync();
-
-                if (orders == null || !orders.Any())
-                {
-                    _logger.LogWarning("No orders found.");
-                    return NotFound("No orders found.");
-                }
-
-                _logger.LogInformation("Successfully fetched {Count} orders.", orders.Count());
-                return Ok(orders);
+                _logger.LogWarning("No orders found.");
+                return NotFound("No orders found.");
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while fetching orders.");
-                return StatusCode(500, "Internal server error");
-            }
+
+            _logger.LogInformation("Successfully fetched {Count} orders.", orders.Count());
+            return Ok(orders);
         }
 
         [Authorize]
         [HttpPost("CreateOrder")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Success.")]
         public async Task<IActionResult> CreateOrder([FromBody] OrderCreateDto orderCreateDto)
         {
             // Validate the input
@@ -123,6 +115,7 @@ namespace DeliveryWebApi.Controllers
 
         [Authorize]
         [HttpPost("{orderId}/status")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Success.")]
         public async Task<IActionResult> ConfirmOrderDelivery(Guid orderId)
         {
             try

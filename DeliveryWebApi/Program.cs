@@ -11,7 +11,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization; // Add this for JsonStringEnumConverter
 using Swashbuckle.AspNetCore.SwaggerGen;
-using Microsoft.OpenApi.Any; // Add this namespace
+using Microsoft.OpenApi.Any;
+using System.Reflection; // Add this namespace
 
 namespace Backend2024ExampleApp
 {
@@ -67,6 +68,7 @@ namespace Backend2024ExampleApp
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
             {
+                options.EnableAnnotations(); // Enable Swagger annotations
                 // Configure Swagger to display enums as strings
                 options.UseAllOfToExtendReferenceSchemas();
                 options.SchemaFilter<EnumSchemaFilter>(); // Add custom schema filter
