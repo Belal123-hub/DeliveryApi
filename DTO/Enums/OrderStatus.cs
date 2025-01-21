@@ -8,7 +8,7 @@ namespace DTO.Enums
 {
     public enum OrderStatus
     {
-        Pending,    // Order is pending
-        Delivered   // Order has been delivered
+        Pending,
+        Delivered  
     }
 }

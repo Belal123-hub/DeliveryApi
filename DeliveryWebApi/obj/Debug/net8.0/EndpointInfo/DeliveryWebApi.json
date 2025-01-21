@@ -36,17 +36,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AddDishToBasketDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AddDishToBasketDto"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/AddDishToBasketDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AddDishToBasketDto"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/AddDishToBasketDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/AddDishToBasketDto"
+                  }
+                ]
               }
             }
           }
@@ -139,7 +151,11 @@
             "name": "sorting",
             "in": "query",
             "schema": {
-              "$ref": "#/components/schemas/DishSorting"
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/DishSorting"
+                }
+              ]
             }
           },
           {
@@ -153,7 +169,11 @@
             "name": "category",
             "in": "query",
             "schema": {
-              "$ref": "#/components/schemas/DishCategory"
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/DishCategory"
+                }
+              ]
             }
           }
         ],
@@ -211,17 +231,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/OrderCreateDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/OrderCreateDto"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/OrderCreateDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/OrderCreateDto"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/OrderCreateDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/OrderCreateDto"
+                  }
+                ]
               }
             }
           }
@@ -242,17 +274,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserCreateDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UserCreateDto"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserCreateDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UserCreateDto"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/UserCreateDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UserCreateDto"
+                  }
+                ]
               }
             }
           }
@@ -273,17 +317,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LoginCredentialsDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LoginCredentialsDto"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/LoginCredentialsDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LoginCredentialsDto"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/LoginCredentialsDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/LoginCredentialsDto"
+                  }
+                ]
               }
             }
           }
@@ -304,17 +360,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RefreshCredentialsDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RefreshCredentialsDto"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/RefreshCredentialsDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RefreshCredentialsDto"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/RefreshCredentialsDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/RefreshCredentialsDto"
+                  }
+                ]
               }
             }
           }
@@ -357,17 +425,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserEditModelDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UserEditModelDto"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserEditModelDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UserEditModelDto"
+                  }
+                ]
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/UserEditModelDto"
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UserEditModelDto"
+                  }
+                ]
               }
             }
           }
@@ -461,7 +541,15 @@
             "format": "date-time"
           },
           "status": {
-            "$ref": "#/components/schemas/OrderStatus"
+            "enum": [
+              "Pending",
+              "Delivered"
+            ],
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OrderStatus"
+              }
+            ]
           },
           "price": {
             "type": "number",
@@ -472,11 +560,10 @@
       },
       "OrderStatus": {
         "enum": [
-          0,
-          1
+          "Pending",
+          "Delivered"
         ],
-        "type": "integer",
-        "format": "int32"
+        "type": "string"
       },
       "RefreshCredentialsDto": {
         "type": "object",
