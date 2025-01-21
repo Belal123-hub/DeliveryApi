@@ -16,6 +16,8 @@ namespace BLL.Services
         Task<IEnumerable<OrderInfoDto>> GetOrdersAsync();
         Task<OrderDto?> CreateOrderFromBasketAsync(Guid userId, OrderCreateDto orderCreateDto);
         Task<OrderDto?> GetOrderByIdAsync(Guid orderId);
+        Task<bool> ConfirmOrderDeliveryAsync(Guid orderId); // New method
+
 
     }
 
@@ -174,6 +176,46 @@ namespace BLL.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"An error occurred while creating an order for user: {userId}");
+                throw;
+            }
+        }
+
+        public async Task<bool> ConfirmOrderDeliveryAsync(Guid orderId)
+        {
+            try
+            {
+                _logger.LogInformation($"Confirming delivery for order with ID: {orderId}");
+
+                // Fetch the order from the database
+                var order = await _context.Orders
+                    .FirstOrDefaultAsync(o => o.Id == orderId);
+
+                if (order == null)
+                {
+                    _logger.LogWarning($"Order with ID: {orderId} not found.");
+                    return false;
+                }
+
+                // Check if the order is already delivered
+                if (order.Status == OrderStatus.Delivered)
+                {
+                    _logger.LogWarning($"Order with ID: {orderId} is already delivered.");
+                    return false;
+                }
+
+                // Update the order status to Delivered
+                order.Status = OrderStatus.Delivered;
+                order.ModifyDateTime = DateTime.UtcNow; // Update the modification timestamp
+
+                // Save changes to the database
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation($"Successfully confirmed delivery for order with ID: {orderId}");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while confirming delivery for order with ID: {orderId}");
                 throw;
             }
         }

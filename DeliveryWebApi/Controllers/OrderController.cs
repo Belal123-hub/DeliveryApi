@@ -120,5 +120,32 @@ namespace DeliveryWebApi.Controllers
                 return StatusCode(500, new { Message = "Internal server error" });
             }
         }
+
+        [Authorize]
+        [HttpPost("{orderId}/status")]
+        public async Task<IActionResult> ConfirmOrderDelivery(Guid orderId)
+        {
+            try
+            {
+                _logger.LogInformation($"Confirming delivery for order with ID: {orderId}");
+
+                // Confirm the order delivery
+                var isConfirmed = await _orderService.ConfirmOrderDeliveryAsync(orderId);
+
+                if (!isConfirmed)
+                {
+                    _logger.LogWarning($"Failed to confirm delivery for order with ID: {orderId}");
+                    return BadRequest(new { Message = "Order not found or already delivered" });
+                }
+
+                _logger.LogInformation($"Successfully confirmed delivery for order with ID: {orderId}");
+                return Ok(new { Message = "Order delivery confirmed successfully" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"An error occurred while confirming delivery for order with ID: {orderId}");
+                return StatusCode(500, new { Message = "Internal server error" });
+            }
+        }
     }
 }

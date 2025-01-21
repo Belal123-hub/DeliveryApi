@@ -18,5 +18,7 @@ namespace DAL.Data
         public decimal Price { get; set; }
         public string Address { get; set; }
         public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
+        public DateTime ModifyDateTime { get; set; }
+
     }
 }

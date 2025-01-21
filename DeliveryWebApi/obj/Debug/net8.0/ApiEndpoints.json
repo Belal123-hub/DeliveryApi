@@ -141,6 +141,22 @@
   },
   {
     "ContainingType": "DeliveryWebApi.Controllers.OrderController",
+    "Method": "ConfirmOrderDelivery",
+    "RelativePath": "api/Order/{orderId}/status",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "orderId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "DeliveryWebApi.Controllers.OrderController",
     "Method": "CreateOrder",
     "RelativePath": "api/Order/CreateOrder",
     "HttpMethod": "POST",
