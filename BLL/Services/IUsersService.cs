@@ -15,10 +15,10 @@ namespace BLL.Services
 {
     public interface IUsersService
     {
-        Task Register(UserCreateDto model);
+        Task Register(UserDto model);
         Task<LoginResponseDto> Login(LoginCredentialsDto model);
         Task<LoginResponseDto> Refresh(string refreshToken);
-        Task<UserPublicModelDto> GetProfile(string email);
+        Task<UserRegisterModelDto> GetProfile(string email);
         Task UpdateProfile(string email, UserEditModelDto model);
     }
     public class UsersService : IUsersService
@@ -33,7 +33,7 @@ namespace BLL.Services
             _context = context;
             _jwtTokenSettings = options.Value;
         }
-        public async Task Register(UserCreateDto model)
+        public async Task Register(UserDto model)
         {
             var existing = await _userManager.FindByEmailAsync(model.Email);
             if (existing != null)
@@ -132,14 +132,14 @@ namespace BLL.Services
             };
         }
 
-        public async Task<UserPublicModelDto> GetProfile(string email) 
+        public async Task<UserRegisterModelDto> GetProfile(string email) 
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
                 throw new KeyNotFoundException($"User with email = {email} does not exist!");
             }
-            return new UserPublicModelDto
+            return new UserRegisterModelDto
             {
                 Name = user.Name,
                 Email = user.Email,

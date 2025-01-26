@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace DTO
 {
-    public class UserCreateDto
+    public class UserDto
     {
         [JsonPropertyName("name")]
         [Required]

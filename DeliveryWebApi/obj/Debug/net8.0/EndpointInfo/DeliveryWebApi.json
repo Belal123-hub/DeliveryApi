@@ -10,21 +10,49 @@
         "tags": [
           "Basket"
         ],
+        "summary": "Get user cart.",
         "responses": {
+          "401": {
+            "description": "Unauthorized."
+          },
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "Not found."
+          },
+          "500": {
+            "description": "InternalServerError.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "200": {
-            "description": "OK"
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DishBasketDto"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/api/Basket/Dish/{DishById}": {
+    "/api/Basket/Dish/{DishID}": {
       "post": {
         "tags": [
           "Basket"
         ],
+        "summary": "Add dish to cart.",
         "parameters": [
           {
-            "name": "DishById",
+            "name": "DishID",
             "in": "path",
             "required": true,
             "schema": {
@@ -64,8 +92,27 @@
           }
         },
         "responses": {
+          "401": {
+            "description": "Unauthorized."
+          },
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "Not found."
+          },
+          "500": {
+            "description": "InternalServerError.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          },
           "200": {
-            "description": "OK"
+            "description": "Success."
           }
         }
       }
@@ -75,6 +122,7 @@
         "tags": [
           "Basket"
         ],
+        "summary": "Decrease the number of dishes in cart (if increase is true) (if increase false remove it completely).",
         "parameters": [
           {
             "name": "DishId",
@@ -94,31 +142,27 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Dish/{id}": {
-      "get": {
-        "tags": [
-          "Dish"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
+          "401": {
+            "description": "Unauthorized."
+          },
+          "403": {
+            "description": "Forbidden."
+          },
+          "404": {
+            "description": "Not found."
+          },
+          "500": {
+            "description": "InternalServerError.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
             }
-          }
-        ],
-        "responses": {
+          },
           "200": {
-            "description": "OK"
+            "description": "Success."
           }
         }
       }
@@ -128,6 +172,7 @@
         "tags": [
           "Dish"
         ],
+        "summary": "Get list of dishes(menue).",
         "parameters": [
           {
             "name": "page",
@@ -179,7 +224,111 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Success.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DishPagedListDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DishPagedListDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DishPagedListDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "InternalServerError.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Dish/{id}": {
+      "get": {
+        "tags": [
+          "Dish"
+        ],
+        "summary": "Get information about concrete dish.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DishDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DishDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DishDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "InternalServerError.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
           }
         }
       }
@@ -189,6 +338,7 @@
         "tags": [
           "Order"
         ],
+        "summary": "Get information about concrete order.",
         "parameters": [
           {
             "name": "orderId",
@@ -258,6 +408,7 @@
         "tags": [
           "Order"
         ],
+        "summary": "Get list of orders.",
         "responses": {
           "401": {
             "description": "Unauthorized."
@@ -325,6 +476,7 @@
         "tags": [
           "Order"
         ],
+        "summary": "Creating the order from dishes in basket.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -397,6 +549,7 @@
         "tags": [
           "Order"
         ],
+        "summary": "Confirm order delivery.",
         "parameters": [
           {
             "name": "orderId",
@@ -449,13 +602,14 @@
         "tags": [
           "User"
         ],
+        "summary": "Register new user.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/UserCreateDto"
+                    "$ref": "#/components/schemas/UserDto"
                   }
                 ]
               }
@@ -464,7 +618,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/UserCreateDto"
+                    "$ref": "#/components/schemas/UserDto"
                   }
                 ]
               }
@@ -473,7 +627,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/UserCreateDto"
+                    "$ref": "#/components/schemas/UserDto"
                   }
                 ]
               }
@@ -482,7 +636,47 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Success.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRegisterModelDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRegisterModelDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRegisterModelDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "InternalServerError.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
           }
         }
       }
@@ -492,6 +686,7 @@
         "tags": [
           "User"
         ],
+        "summary": "Log in to the system.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -525,7 +720,47 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Success.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRegisterModelDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRegisterModelDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRegisterModelDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "InternalServerError.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
           }
         }
       }
@@ -535,6 +770,7 @@
         "tags": [
           "User"
         ],
+        "summary": "Refresh token.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -568,7 +804,53 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Success.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshCredentialsDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshCredentialsDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshCredentialsDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "InternalServerError.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
           }
         }
       }
@@ -578,9 +860,39 @@
         "tags": [
           "User"
         ],
+        "summary": "Log out system user.",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Success."
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "InternalServerError.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
           }
         }
       }
@@ -590,9 +902,53 @@
         "tags": [
           "User"
         ],
+        "summary": "Get User Profile.",
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Success.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "InternalServerError.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
           }
         }
       },
@@ -600,6 +956,7 @@
         "tags": [
           "User"
         ],
+        "summary": "Edit User Profile.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -633,7 +990,36 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Success."
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "InternalServerError.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Response"
+                }
+              }
+            }
           }
         }
       }
@@ -690,6 +1076,76 @@
           "Drink"
         ],
         "type": "string"
+      },
+      "DishDto": {
+        "required": [
+          "name",
+          "price"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "price": {
+            "minimum": 0,
+            "type": "number",
+            "format": "double"
+          },
+          "image": {
+            "type": "string",
+            "nullable": true
+          },
+          "vegetarian": {
+            "type": "boolean"
+          },
+          "rating": {
+            "maximum": 5,
+            "minimum": 0,
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "category": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DishCategory"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DishPagedListDto": {
+        "type": "object",
+        "properties": {
+          "dishes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DishDto"
+            },
+            "nullable": true
+          },
+          "paginatin": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PageInfoModel"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
       },
       "DishSorting": {
         "enum": [
@@ -818,6 +1274,24 @@
         ],
         "type": "string"
       },
+      "PageInfoModel": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "current": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "RefreshCredentialsDto": {
         "type": "object",
         "properties": {
@@ -842,7 +1316,7 @@
         },
         "additionalProperties": false
       },
-      "UserCreateDto": {
+      "UserDto": {
         "required": [
           "email",
           "name",
@@ -883,6 +1357,24 @@
           "phoneNumber": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UserRegisterModelDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date"
           }
         },
         "additionalProperties": false

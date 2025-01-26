@@ -30,6 +30,7 @@ namespace DeliveryWebApi.Controllers
         }
 
         [HttpGet("{orderId}")]
+        [SwaggerOperation(Summary = "Get information about concrete order.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Success.", typeof(OrderDto))]
         public async Task<IActionResult> GetOrderById(Guid orderId)
         {
@@ -49,6 +50,7 @@ namespace DeliveryWebApi.Controllers
         }
 
         [HttpGet]
+        [SwaggerOperation(Summary = "Get list of orders.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Success.", typeof(IEnumerable<OrderInfoDto>))]
         public async Task<ActionResult<IEnumerable<OrderInfoDto>>> GetOrders()
         {
@@ -68,6 +70,7 @@ namespace DeliveryWebApi.Controllers
 
         [Authorize]
         [HttpPost("CreateOrder")]
+        [SwaggerOperation(Summary = "Creating the order from dishes in basket.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Success.")]
         public async Task<IActionResult> CreateOrder([FromBody] OrderCreateDto orderCreateDto)
         {
@@ -115,6 +118,7 @@ namespace DeliveryWebApi.Controllers
 
         [Authorize]
         [HttpPost("{orderId}/status")]
+        [SwaggerOperation(Summary = "Confirm order delivery.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Success.")]
         public async Task<IActionResult> ConfirmOrderDelivery(Guid orderId)
         {

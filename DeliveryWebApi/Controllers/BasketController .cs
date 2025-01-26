@@ -3,16 +3,20 @@ using BLL.Services;
 using DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Security.Claims;
 
 namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [SwaggerResponse(StatusCodes.Status401Unauthorized, "Unauthorized.")]
+    [SwaggerResponse(StatusCodes.Status403Forbidden, "Forbidden.")]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "Not found.")]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "InternalServerError.", typeof(Response))]
     public class BasketController : ControllerBase
     {
         private readonly ILogger<BasketController> _logger;
-
         private readonly IBasketService _basketService;
 
         public BasketController(IBasketService basketService, ILogger<BasketController> logger)
@@ -23,6 +27,9 @@ namespace API.Controllers
 
         [Authorize]
         [HttpGet]
+        [SwaggerOperation(Summary = "Get user cart.")]
+        [Produces("application/json")] 
+        [SwaggerResponse(StatusCodes.Status200OK, "Success.", typeof(DishBasketDto))]
         public async Task<IActionResult> GetAllDishesInBasket()
         {
             // Extract the userId from the authenticated user's claims
@@ -42,8 +49,11 @@ namespace API.Controllers
         }
 
         [Authorize]
-        [HttpPost("Dish/{DishById}")]
-        public async Task<IActionResult> AddDishToBasket([FromBody] AddDishToBasketDto addDishToBasketDto)
+        [HttpPost("Dish/{DishID}")]
+        [SwaggerOperation(Summary = "Add dish to cart.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Success.")]
+        [Produces("application/json")]
+        public async Task<IActionResult> AddDishToBasket( AddDishToBasketDto addDishToBasketDto)
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
 
@@ -60,10 +70,11 @@ namespace API.Controllers
             return Ok("Success");
         }
 
-
-        // DELETE: api/Basket/Clear
         [Authorize]
         [HttpDelete("Dish/{DishId}")]
+        [SwaggerOperation(Summary = "Decrease the number of dishes in cart (if increase is true) (if increase false remove it completely).")]
+        [Produces("application/json")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Success.")]
         public async Task<IActionResult> UpdateOrRemoveDishFromBasket(Guid DishId, [FromQuery] bool increase)
         {
             if (DishId == Guid.Empty)
@@ -86,6 +97,5 @@ namespace API.Controllers
                 return NotFound(new { Message = "Dish not found or could not be updated" });
             }
         }
-
     }
 }

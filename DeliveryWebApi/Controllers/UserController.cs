@@ -4,6 +4,7 @@ using DTO;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Backend2024ExampleApp.Controllers
 {
@@ -18,7 +19,11 @@ namespace Backend2024ExampleApp.Controllers
             this._usersService = usersService;
         }
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] UserCreateDto model)
+        [SwaggerOperation(Summary = "Register new user.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Success.", typeof(UserRegisterModelDto))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest)]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "InternalServerError.", typeof(Response))]
+        public async Task<IActionResult> Register([FromBody] UserDto model)
         {
             if (!ModelState.IsValid)
             {
@@ -42,6 +47,10 @@ namespace Backend2024ExampleApp.Controllers
         }
 
         [HttpPost("login")]
+        [SwaggerOperation(Summary = "Log in to the system.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Success.", typeof(UserRegisterModelDto))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest)]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "InternalServerError.", typeof(Response))]
         public async Task<IActionResult> Login([FromBody] LoginCredentialsDto model)
         {
             try
@@ -59,6 +68,12 @@ namespace Backend2024ExampleApp.Controllers
         }
 
         [HttpPost("refresh")]
+        [SwaggerOperation(Summary = "Refresh token.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Success.", typeof(RefreshCredentialsDto))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest)]
+        [SwaggerResponse(StatusCodes.Status401Unauthorized)]
+        [SwaggerResponse(StatusCodes.Status403Forbidden)]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "InternalServerError.", typeof(Response))]
         public async Task<IActionResult> Refresh([FromBody] RefreshCredentialsDto model)
         {
             try
@@ -81,6 +96,12 @@ namespace Backend2024ExampleApp.Controllers
 
         [Authorize]
         [HttpPost("logout")]
+        [SwaggerOperation(Summary = "Log out system user.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Success.")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest)]
+        [SwaggerResponse(StatusCodes.Status401Unauthorized)]
+        [SwaggerResponse(StatusCodes.Status403Forbidden)]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "InternalServerError.", typeof(Response))]
         public async Task<IActionResult> Logout()
         {
             try
@@ -110,6 +131,11 @@ namespace Backend2024ExampleApp.Controllers
 
         [Authorize]
         [HttpGet("Profile")]
+        [SwaggerOperation(Summary = "Get User Profile.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Success.", typeof(UserDto))]
+        [SwaggerResponse(StatusCodes.Status401Unauthorized)]
+        [SwaggerResponse(StatusCodes.Status403Forbidden)]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "InternalServerError.", typeof(Response))]
         public async Task<IActionResult> Profile()
         {
             var emailClaim = User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email);
@@ -118,6 +144,12 @@ namespace Backend2024ExampleApp.Controllers
 
         [Authorize]
         [HttpPut("Profile")]
+        [SwaggerOperation(Summary = "Edit User Profile.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Success.")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest)]
+        [SwaggerResponse(StatusCodes.Status401Unauthorized)]
+        [SwaggerResponse(StatusCodes.Status403Forbidden)]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "InternalServerError.", typeof(Response))]
         public async Task<IActionResult> EditProfile([FromBody] UserEditModelDto model)
         {
             try
