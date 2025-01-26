@@ -15,8 +15,10 @@ namespace Backend2024ExampleApp.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly IUsersService _usersService;
         private readonly ITokenService _tokenService;
-        public UserController(IUsersService usersService) { 
-            this._usersService = usersService;
+        public UserController(IUsersService usersService, ITokenService tokenService, ILogger<UserController> logger) { 
+          _usersService = usersService;
+            _tokenService = tokenService;
+            _logger = logger;
         }
         [HttpPost("register")]
         [SwaggerOperation(Summary = "Register new user.")]
@@ -106,6 +108,12 @@ namespace Backend2024ExampleApp.Controllers
         {
             try
             {
+                if (User == null || User.Claims == null)
+                {
+                    _logger.LogWarning("User or User.Claims is null.");
+                    return BadRequest("User not authenticated.");
+                }
+
                 var userIdClaim = User.Claims.FirstOrDefault(x => x.Type == "Id");
                 if (userIdClaim == null)
                 {
@@ -115,7 +123,7 @@ namespace Backend2024ExampleApp.Controllers
 
                 await _tokenService.Logout(Guid.Parse(userIdClaim.Value));
                 _logger.LogInformation($"User {userIdClaim.Value} successfully logged out.");
-                return Ok(new { Message = "Logout successful." });
+                return Ok(new { Message = "Success" });
             }
             catch (FormatException ex)
             {
