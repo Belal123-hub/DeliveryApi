@@ -10,7 +10,7 @@ namespace BLL.Services
     {
         Task<DishPagedListDto> GetAllDishesAsync(int page, int size, DishSorting? sorting, bool? vegetarian, DishCategory? category);
         Task<DishDto?> GetDishByIdAsync(Guid id);
-
+        Task<bool> CanUserRateDishAsync(Guid userId, Guid dishId);
     }
     public class DishService : IDishesService
     {
@@ -89,6 +89,29 @@ namespace BLL.Services
                     Current = page,
                 }
             };
+        }
+
+        public async Task<bool> CanUserRateDishAsync(Guid userId, Guid dishId)
+        {
+            // Check if the dish exists
+            var dishExists = await _context.Dishes.AnyAsync(d => d.Id == dishId);
+            if (!dishExists)
+            {
+                return false; // Dish does not exist
+            }
+
+            // Check if the user has already rated the dish
+            var hasRated = await _context.DishRatings.AnyAsync(r => r.UserId == userId && r.DishId == dishId);
+            if (hasRated)
+            {
+                return false; // User has already rated the dish
+            }
+
+            // Optional: Check if the user has ordered the dish before (if required)
+            var hasOrdered = await _context.Orders
+                .AnyAsync(o => o.UserId == userId && o.Items.Any(oi => oi.DishId == dishId));
+
+            return hasOrdered; // User can rate the dish if they have ordered it
         }
 
     }

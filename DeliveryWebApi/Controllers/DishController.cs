@@ -1,6 +1,7 @@
 ﻿using BLL.Services;
 using DTO;
 using DTO.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -11,10 +12,13 @@ namespace DeliveryWebApi.Controllers
     public class DishController : ControllerBase
     {
         private readonly IDishesService _dishesService;
+        private readonly ILogger<OrderController> _logger;
 
-        public DishController(IDishesService dishesService)
+
+        public DishController(IDishesService dishesService, ILogger<OrderController> logger)
         {
             _dishesService = dishesService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -45,6 +49,39 @@ namespace DeliveryWebApi.Controllers
                 return NotFound(new Response { Status = "Error", Message = "Dish not found" });
 
             return Ok(dish);
+        }
+
+        [Authorize]
+        [HttpGet("{id}/rating/check")]
+        [SwaggerOperation(Summary = "Check if the user can rate the dish.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Success.", typeof(bool))]
+        [SwaggerResponse(StatusCodes.Status401Unauthorized)]
+        [SwaggerResponse(StatusCodes.Status403Forbidden)]
+        [SwaggerResponse(StatusCodes.Status404NotFound)]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "InternalServerError.", typeof(Response))]
+        public async Task<IActionResult> CanRateDish(Guid id)
+        {
+            try
+            {
+                // Get the authenticated user's ID
+                var userIdClaim = User.Claims.FirstOrDefault(x => x.Type == "Id");
+                if (userIdClaim == null)
+                {
+                    return Unauthorized("User ID claim not found.");
+                }
+
+                var userId = Guid.Parse(userIdClaim.Value);
+
+                // Check if the user can rate the dish
+                var canRate = await _dishesService.CanUserRateDishAsync(userId, id);
+
+                return Ok(canRate);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while checking if the user can rate the dish.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "An error occurred while processing your request." });
+            }
         }
     }
 }
