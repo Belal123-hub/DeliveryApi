@@ -648,7 +648,7 @@
     "Parameters": [
       {
         "Name": "model",
-        "Type": "DTO.UserDto",
+        "Type": "DTO.UserRegisterModelDto",
         "IsRequired": true
       }
     ],

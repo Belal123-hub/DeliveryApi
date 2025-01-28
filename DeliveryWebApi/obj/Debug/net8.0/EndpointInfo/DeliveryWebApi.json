@@ -609,7 +609,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/UserDto"
+                    "$ref": "#/components/schemas/UserRegisterModelDto"
                   }
                 ]
               }
@@ -618,7 +618,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/UserDto"
+                    "$ref": "#/components/schemas/UserRegisterModelDto"
                   }
                 ]
               }
@@ -627,7 +627,7 @@
               "schema": {
                 "allOf": [
                   {
-                    "$ref": "#/components/schemas/UserDto"
+                    "$ref": "#/components/schemas/UserRegisterModelDto"
                   }
                 ]
               }
@@ -1158,6 +1158,13 @@
         ],
         "type": "string"
       },
+      "Gender": {
+        "enum": [
+          "Male",
+          "Female"
+        ],
+        "type": "string"
+      },
       "LoginCredentialsDto": {
         "type": "object",
         "properties": {
@@ -1319,40 +1326,81 @@
       "UserDto": {
         "required": [
           "email",
-          "name",
-          "password"
+          "fullName",
+          "gender"
         ],
         "type": "object",
         "properties": {
-          "name": {
-            "minLength": 1,
-            "type": "string"
+          "id": {
+            "type": "string",
+            "format": "uuid"
           },
-          "email": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "password": {
+          "fullName": {
             "minLength": 1,
             "type": "string"
           },
           "birthDate": {
             "type": "string",
-            "format": "date-time"
+            "format": "date-time",
+            "nullable": true
+          },
+          "gender": {
+            "enum": [
+              "Male",
+              "Female"
+            ],
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Gender"
+              }
+            ]
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
       },
       "UserEditModelDto": {
+        "required": [
+          "fullName",
+          "gender"
+        ],
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string",
-            "nullable": true
+          "fullName": {
+            "minLength": 1,
+            "type": "string"
           },
           "birthDate": {
             "type": "string",
-            "format": "date"
+            "format": "date-time",
+            "nullable": true
+          },
+          "gender": {
+            "enum": [
+              "Male",
+              "Female"
+            ],
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Gender"
+              }
+            ]
+          },
+          "address": {
+            "type": "string",
+            "nullable": true
           },
           "phoneNumber": {
             "type": "string",
@@ -1362,19 +1410,50 @@
         "additionalProperties": false
       },
       "UserRegisterModelDto": {
+        "required": [
+          "email",
+          "fullName",
+          "gender",
+          "password"
+        ],
         "type": "object",
         "properties": {
-          "name": {
-            "type": "string",
-            "nullable": true
+          "fullName": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "password": {
+            "minLength": 6,
+            "type": "string"
           },
           "email": {
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "address": {
             "type": "string",
             "nullable": true
           },
           "birthDate": {
             "type": "string",
-            "format": "date"
+            "format": "date-time",
+            "nullable": true
+          },
+          "gender": {
+            "enum": [
+              "Male",
+              "Female"
+            ],
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Gender"
+              }
+            ]
+          },
+          "phoneNumber": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false

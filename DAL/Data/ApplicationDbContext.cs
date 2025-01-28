@@ -14,6 +14,7 @@ namespace DAL.Data
         public override DbSet<Role> Roles { get; set; }
         public DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
         public DbSet<LogoutUser> LogoutUsers { get; set; }
+        public DbSet<BlacklistedToken> BlacklistedTokens { get; set; }
         public DbSet<Dish> Dishes { get; set; }
         public DbSet<Basket> Baskets { get; set; }
         public DbSet<BasketItem> BasketItems { get; set; }

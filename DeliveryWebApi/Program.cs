@@ -12,7 +12,8 @@ using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization; // Add this for JsonStringEnumConverter
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.OpenApi.Any;
-using System.Reflection; // Add this namespace
+using System.Reflection;
+using DeliveryWebApi.MiddleWares; // Add this namespace
 
 namespace Backend2024ExampleApp
 {
@@ -157,6 +158,7 @@ namespace Backend2024ExampleApp
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            app.UseMiddleware<TokenValidationMiddleWare>();
 
             app.UseHttpsRedirection();
 

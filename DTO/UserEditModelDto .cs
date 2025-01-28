@@ -11,10 +11,17 @@ namespace DTO
 {
     public class UserEditModelDto
     {
-        public string Name { get; set; } // Required
-        public DateOnly BirthDate { get; set; } // Optional, nullable
-        //public Gender Gender { get; set; } // Required
-        //public string Address { get; set; } // Optional, nullable
-        public string PhoneNumber { get; set; } // Optional, nullable
+        [Required]
+        [MinLength(1)]
+        public string FullName { get; set; }
+
+        public DateTime? BirthDate { get; set; }
+
+        [Required]
+        public Gender Gender { get; set; }
+
+        public string? Address { get; set; }
+
+        public string? PhoneNumber { get; set; }
     }
 }

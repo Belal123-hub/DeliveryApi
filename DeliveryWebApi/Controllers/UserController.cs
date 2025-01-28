@@ -25,7 +25,7 @@ namespace Backend2024ExampleApp.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, "Success.", typeof(UserRegisterModelDto))]
         [SwaggerResponse(StatusCodes.Status400BadRequest)]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "InternalServerError.", typeof(Response))]
-        public async Task<IActionResult> Register([FromBody] UserDto model)
+        public async Task<IActionResult> Register([FromBody] UserRegisterModelDto model)
         {
             if (!ModelState.IsValid)
             {
@@ -34,7 +34,7 @@ namespace Backend2024ExampleApp.Controllers
 
             try
             {
-                await _usersService.Register(model);
+                await _usersService.Register(model); // Directly pass the UserRegisterModelDto
             }
             catch (ArgumentException ex)
             {
@@ -121,7 +121,8 @@ namespace Backend2024ExampleApp.Controllers
                     return BadRequest("User ID claim not found.");
                 }
 
-                await _tokenService.Logout(Guid.Parse(userIdClaim.Value));
+                var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                await _tokenService.Logout(Guid.Parse(userIdClaim.Value), token);
                 _logger.LogInformation($"User {userIdClaim.Value} successfully logged out.");
                 return Ok(new { Message = "Success" });
             }
