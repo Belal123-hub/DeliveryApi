@@ -14,11 +14,22 @@ namespace DAL.Data
         public override DbSet<Role> Roles { get; set; }
         public DbSet<UserRefreshToken> UserRefreshTokens { get; set; }
         public DbSet<LogoutUser> LogoutUsers { get; set; }
+        public DbSet<BlacklistedToken> BlacklistedTokens { get; set; }
         public DbSet<Dish> Dishes { get; set; }
+        public DbSet<Basket> Baskets { get; set; }
+        public DbSet<BasketItem> BasketItems { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Basket>()
+                .HasMany(b => b.Items)
+                .WithOne(i => i.Basket)
+                .HasForeignKey(i => i.BasketId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         public override int SaveChanges()

@@ -6,7 +6,7 @@ namespace DTO
 {
     public class DishDto
     {
-        public int Id { get; set; } // UUID for the dish
+        public Guid Id { get; set; } // UUID for the dish
 
         [Required]
         [MinLength(1)]
@@ -16,7 +16,7 @@ namespace DTO
 
         [Required]
         [Range(0, double.MaxValue, ErrorMessage = "Price must be a positive value")]
-        public double Price { get; set; } // Required price, must be a positive number
+        public decimal Price { get; set; } // Required price, must be a positive number
 
         public string? Image { get; set; } // Optional URL or path to the dish image
 

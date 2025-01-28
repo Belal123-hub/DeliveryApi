@@ -15,10 +15,10 @@ namespace BLL.Services
 {
     public interface IUsersService
     {
-        Task Register(UserCreateDto model);
+        Task Register(UserRegisterModelDto model);
         Task<LoginResponseDto> Login(LoginCredentialsDto model);
         Task<LoginResponseDto> Refresh(string refreshToken);
-        Task<UserPublicModelDto> GetProfile(string email);
+        Task<UserDto> GetProfile(string email);
         Task UpdateProfile(string email, UserEditModelDto model);
     }
     public class UsersService : IUsersService
@@ -33,7 +33,7 @@ namespace BLL.Services
             _context = context;
             _jwtTokenSettings = options.Value;
         }
-        public async Task Register(UserCreateDto model)
+        public async Task Register(UserRegisterModelDto model)
         {
             var existing = await _userManager.FindByEmailAsync(model.Email);
             if (existing != null)
@@ -43,13 +43,16 @@ namespace BLL.Services
 
             var identityUser = new User()
             {
-                Name = model.Name,
+                FullName = model.FullName,
                 Email = model.Email,
-                BirthDate = DateOnly.FromDateTime(model.BirthDate),
+                BirthDate = model.BirthDate,
+                Gender = model.Gender,
+                Address = model.Address,
+                PhoneNumber = model.PhoneNumber,
                 UserName = model.Email
             };
 
-            var result = await _userManager.CreateAsync(identityUser, model.Password);
+            var result = await _userManager.CreateAsync(identityUser, model.Password); 
             if (!result.Succeeded)
             {
                 throw new Exception($"Some errors during creating user! Data: {result.Errors}");
@@ -98,7 +101,7 @@ namespace BLL.Services
                 Subject = new ClaimsIdentity(new List<Claim>
                 {
                     new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Name, user.Name),
+                    new Claim(ClaimTypes.Name, user.FullName),
                     new Claim("Id", user.Id.ToString()),
                     new Claim(ClaimTypes.Role, isAdmin ? ApplicationRoleNames.Administrator : ApplicationRoleNames.User),
                 }),
@@ -132,22 +135,27 @@ namespace BLL.Services
             };
         }
 
-        public async Task<UserPublicModelDto> GetProfile(string email) 
+        public async Task<UserDto> GetProfile(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
                 throw new KeyNotFoundException($"User with email = {email} does not exist!");
             }
-            return new UserPublicModelDto
+
+            return new UserDto
             {
-                Name = user.Name,
+                Id = user.Id,
+                FullName = user.FullName,
                 Email = user.Email,
                 BirthDate = user.BirthDate,
+                Gender = user.Gender,
+                Address = user.Address,
+                PhoneNumber = user.PhoneNumber
             };
         }
 
-        public async Task UpdateProfile(string email, UserEditModelDto model) 
+        public async Task UpdateProfile(string email, UserEditModelDto model)
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
@@ -155,9 +163,11 @@ namespace BLL.Services
                 throw new KeyNotFoundException($"User with email = {email} does not exist!");
             }
 
-            user.Name = model.Name;
+            user.FullName = model.FullName;
             user.BirthDate = model.BirthDate;
-            user.SocialNumber = model.PhoneNumber;
+            user.Gender = model.Gender;
+            user.Address = model.Address;
+            user.PhoneNumber = model.PhoneNumber;
 
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
