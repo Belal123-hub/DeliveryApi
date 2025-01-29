@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250126181017_Initial")]
-    partial class Initial
+    [Migration("20250128155752_UpdateEntities")]
+    partial class UpdateEntities
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,6 +44,9 @@ namespace DAL.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Baskets");
                 });
@@ -86,7 +89,27 @@ namespace DAL.Migrations
 
                     b.HasIndex("BasketId");
 
+                    b.HasIndex("DishId");
+
                     b.ToTable("BasketItems");
+                });
+
+            modelBuilder.Entity("DAL.Data.BlacklistedToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("ExpiryDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BlacklistedTokens");
                 });
 
             modelBuilder.Entity("DAL.Data.Dish", b =>
@@ -130,6 +153,30 @@ namespace DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Dishes");
+                });
+
+            modelBuilder.Entity("DAL.Data.DishRating", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("DishId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("RatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("RatingScore")
+                        .HasColumnType("integer");
+
+                    b.HasKey("UserId", "DishId");
+
+                    b.HasIndex("DishId");
+
+                    b.ToTable("DishRatings");
                 });
 
             modelBuilder.Entity("DAL.Data.LogoutUser", b =>
@@ -185,6 +232,8 @@ namespace DAL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Orders");
                 });
 
@@ -214,6 +263,8 @@ namespace DAL.Migrations
                         .HasColumnType("numeric");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DishId");
 
                     b.HasIndex("OrderId");
 
@@ -265,8 +316,11 @@ namespace DAL.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
-                    b.Property<DateOnly>("BirthDate")
-                        .HasColumnType("date");
+                    b.Property<string>("Address")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("BirthDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -285,6 +339,13 @@ namespace DAL.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Gender")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
 
@@ -293,10 +354,6 @@ namespace DAL.Migrations
 
                     b.Property<DateTime>("ModifyDateTime")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -316,9 +373,6 @@ namespace DAL.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("text");
-
-                    b.Property<string>("SocialNumber")
                         .HasColumnType("text");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -473,6 +527,17 @@ namespace DAL.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("DAL.Basket", b =>
+                {
+                    b.HasOne("DAL.Data.User", "User")
+                        .WithOne("Basket")
+                        .HasForeignKey("DAL.Basket", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("DAL.Data.BasketItem", b =>
                 {
                     b.HasOne("DAL.Basket", "Basket")
@@ -481,16 +546,62 @@ namespace DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DAL.Data.Dish", "Dish")
+                        .WithMany()
+                        .HasForeignKey("DishId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Basket");
+
+                    b.Navigation("Dish");
+                });
+
+            modelBuilder.Entity("DAL.Data.DishRating", b =>
+                {
+                    b.HasOne("DAL.Data.Dish", "Dish")
+                        .WithMany("Ratings")
+                        .HasForeignKey("DishId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DAL.Data.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dish");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DAL.Data.Order", b =>
+                {
+                    b.HasOne("DAL.Data.User", "User")
+                        .WithMany("Orders")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DAL.Data.OrderItem", b =>
                 {
+                    b.HasOne("DAL.Data.Dish", "Dish")
+                        .WithMany()
+                        .HasForeignKey("DishId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("DAL.Data.Order", "Order")
                         .WithMany("Items")
                         .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Dish");
 
                     b.Navigation("Order");
                 });
@@ -551,9 +662,22 @@ namespace DAL.Migrations
                     b.Navigation("Items");
                 });
 
+            modelBuilder.Entity("DAL.Data.Dish", b =>
+                {
+                    b.Navigation("Ratings");
+                });
+
             modelBuilder.Entity("DAL.Data.Order", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("DAL.Data.User", b =>
+                {
+                    b.Navigation("Basket")
+                        .IsRequired();
+
+                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

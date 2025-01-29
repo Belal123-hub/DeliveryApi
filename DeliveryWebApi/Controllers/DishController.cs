@@ -25,7 +25,7 @@ namespace DeliveryWebApi.Controllers
         [SwaggerOperation(Summary = "Get list of dishes(menue).")]
         [SwaggerResponse(StatusCodes.Status200OK, "Success.", typeof(DishPagedListDto))]
         [SwaggerResponse(StatusCodes.Status404NotFound)]
-        [SwaggerResponse(StatusCodes.Status500InternalServerError,"InternalServerError.",typeof(Response))]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "InternalServerError.", typeof(Response))]
         public async Task<IActionResult> GetAllDishes(
             [FromQuery] int page = 1,
             [FromQuery] int size = 10,
@@ -80,6 +80,51 @@ namespace DeliveryWebApi.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occurred while checking if the user can rate the dish.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "An error occurred while processing your request." });
+            }
+        }
+
+        [Authorize]
+        [HttpPost("{id}/rating")]
+        [SwaggerOperation(Summary = "Set a rating for a dish.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Success.")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Bad Request.")]
+        [SwaggerResponse(StatusCodes.Status401Unauthorized)]
+        [SwaggerResponse(StatusCodes.Status403Forbidden)]
+        [SwaggerResponse(StatusCodes.Status404NotFound)]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "InternalServerError.", typeof(Response))]
+        public async Task<IActionResult> SetDishRating(Guid id, [FromQuery] int ratingScore)
+        {
+            try
+            {
+                // Get the authenticated user's ID
+                var userIdClaim = User.Claims.FirstOrDefault(x => x.Type == "Id");
+                if (userIdClaim == null)
+                {
+                    return Unauthorized("User ID claim not found.");
+                }
+
+                var userId = Guid.Parse(userIdClaim.Value);
+
+                // Check if the user can rate the dish
+                var canRate = await _dishesService.CanUserRateDishAsync(userId, id);
+                if (!canRate)
+                {
+                    return Forbid(); // User is not allowed to rate the dish
+                }
+
+                // Set the rating
+                var result = await _dishesService.SetDishRatingAsync(userId, id, ratingScore);
+                if (!result)
+                {
+                    return BadRequest("Unable to set the rating.");
+                }
+
+                return Ok("Success");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred while setting the dish rating.");
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "An error occurred while processing your request." });
             }
         }

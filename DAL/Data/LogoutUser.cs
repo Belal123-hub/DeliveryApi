@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DAL.Data
 {
-    public class LogoutUser: IBaseEntity
+    public class LogoutUser : IBaseEntity
     {
         public Guid Id { get; set; }
         public DateTime CreateDateTime { get; set; }

@@ -12,6 +12,7 @@ namespace DAL.Data
         public Guid OrderId { get; set; }
         public Order Order { get; set; }
         public Guid DishId { get; set; }
+        public Dish Dish { get; set; } // Navigation property to Dish
         public string Name { get; set; }
         public decimal Price { get; set; }
         public int Amount { get; set; }

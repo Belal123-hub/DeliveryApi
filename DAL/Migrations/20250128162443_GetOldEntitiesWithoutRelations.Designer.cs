@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250128100254_AddBlacklistedTokenTable")]
-    partial class AddBlacklistedTokenTable
+    [Migration("20250128162443_GetOldEntitiesWithoutRelations")]
+    partial class GetOldEntitiesWithoutRelations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -148,6 +148,29 @@ namespace DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Dishes");
+                });
+
+            modelBuilder.Entity("DAL.Data.DishRating", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("DishId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("RatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double>("Rating")
+                        .HasColumnType("double precision");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DishRatings");
                 });
 
             modelBuilder.Entity("DAL.Data.LogoutUser", b =>

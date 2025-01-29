@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace DAL
 {
-    public class Basket : IBaseEntity
+    public class Basket
     {
-        [Key]
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
+        public User User { get; set; } // Navigation property to User
         public ICollection<BasketItem> Items { get; set; } = new List<BasketItem>();
         public DateTime CreateDateTime { get; set; }
         public DateTime ModifyDateTime { get; set; }

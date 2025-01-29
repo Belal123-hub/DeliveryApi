@@ -26,11 +26,57 @@ namespace DAL.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // Basket and BasketItem relationship
             modelBuilder.Entity<Basket>()
                 .HasMany(b => b.Items)
                 .WithOne(i => i.Basket)
                 .HasForeignKey(i => i.BasketId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Order and OrderItem relationship
+            modelBuilder.Entity<Order>()
+                .HasMany(o => o.Items)
+                .WithOne(oi => oi.Order)
+                .HasForeignKey(oi => oi.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // DishRating composite key and relationships
+            modelBuilder.Entity<DishRating>()
+                .HasKey(dr => new { dr.UserId, dr.DishId });
+
+            modelBuilder.Entity<DishRating>()
+                .HasOne(dr => dr.User)
+                .WithMany()
+                .HasForeignKey(dr => dr.UserId);
+
+            modelBuilder.Entity<DishRating>()
+                .HasOne(dr => dr.Dish)
+                .WithMany()
+                .HasForeignKey(dr => dr.DishId);
+
+            // User and Order relationship
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.User)
+                .WithMany()
+                .HasForeignKey(o => o.UserId);
+
+            // Basket and User relationship
+            modelBuilder.Entity<Basket>()
+                .HasOne(b => b.User)
+                .WithMany()
+                .HasForeignKey(b => b.UserId);
+
+            // BasketItem and Dish relationship
+            modelBuilder.Entity<BasketItem>()
+                .HasOne(bi => bi.Dish)
+                .WithMany()
+                .HasForeignKey(bi => bi.DishId);
+
+            // OrderItem and Dish relationship
+            modelBuilder.Entity<OrderItem>()
+                .HasOne(oi => oi.Dish)
+                .WithMany()
+                .HasForeignKey(oi => oi.DishId);
         }
 
         public override int SaveChanges()

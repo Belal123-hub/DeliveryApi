@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DAL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250128104552_AddRatingToDish")]
+    [Migration("20250128164739_AddRatingToDish")]
     partial class AddRatingToDish
     {
         /// <inheritdoc />
@@ -152,23 +152,18 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("DAL.Data.DishRating", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("DishId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("RatedAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<int>("RatingScore")
+                        .HasColumnType("integer");
 
-                    b.Property<double>("Rating")
-                        .HasColumnType("double precision");
+                    b.HasKey("UserId", "DishId");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
+                    b.HasIndex("DishId");
 
                     b.ToTable("DishRatings");
                 });
@@ -526,6 +521,25 @@ namespace DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("Basket");
+                });
+
+            modelBuilder.Entity("DAL.Data.DishRating", b =>
+                {
+                    b.HasOne("DAL.Data.Dish", "Dish")
+                        .WithMany()
+                        .HasForeignKey("DishId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DAL.Data.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dish");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DAL.Data.OrderItem", b =>

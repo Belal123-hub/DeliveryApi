@@ -8,10 +8,12 @@ namespace DAL.Data
 {
     public class DishRating
     {
-        public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public Guid DishId { get; set; }
-        public double Rating { get; set; }
-        public DateTime RatedAt { get; set; }
+        public int RatingScore { get; set; } // Rating score (e.g., 1 to 5)
+
+        // Navigation properties
+        public User User { get; set; }
+        public Dish Dish { get; set; }
     }
 }

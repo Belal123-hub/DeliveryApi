@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace DAL.Data
 {
-    public class BasketItem : IBaseEntity
+    public class BasketItem
     {
-        [Key]
         public Guid Id { get; set; }
         public Guid BasketId { get; set; }
         public Basket Basket { get; set; }
         public Guid DishId { get; set; }
+        public Dish Dish { get; set; } // Navigation property to Dish
         public string Name { get; set; }
         public decimal Price { get; set; }
         public int Amount { get; set; }

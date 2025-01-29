@@ -11,7 +11,7 @@ namespace DAL.Data
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
-
+        public User User { get; set; } // Navigation property to User
         public DateTime DeliveryTime { get; set; }
         public DateTime OrderTime { get; set; }
         public OrderStatus Status { get; set; }
@@ -19,6 +19,5 @@ namespace DAL.Data
         public string Address { get; set; }
         public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
         public DateTime ModifyDateTime { get; set; }
-
     }
 }
