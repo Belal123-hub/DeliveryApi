@@ -161,3 +161,4 @@ C:\Users\Belal\Desktop\en-backend-backend-24-1\DeliveryWebApi\obj\Debug\net8.0\s
 C:\Users\Belal\Desktop\en-backend-backend-24-1\DeliveryWebApi\obj\Debug\net8.0\staticwebassets\msbuild.DeliveryWebApi.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
 C:\Users\Belal\Desktop\en-backend-backend-24-1\DeliveryWebApi\obj\Debug\net8.0\Delivery.F1856E98.Up2Date
 C:\Users\Belal\Desktop\en-backend-backend-24-1\DeliveryWebApi\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Users\Belal\Desktop\en-backend-backend-24-1\DeliveryWebApi\bin\Debug\net8.0\Swashbuckle.AspNetCore.Annotations.dll

@@ -120,7 +120,11 @@
         "frameworks": {
           "net8.0": {
             "targetAlias": "net8.0",
-            "projectReferences": {}
+            "projectReferences": {
+              "C:\\Users\\Belal\\Desktop\\en-backend-backend-24-1\\DTO\\DTO.csproj": {
+                "projectPath": "C:\\Users\\Belal\\Desktop\\en-backend-backend-24-1\\DTO\\DTO.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
@@ -278,6 +282,10 @@
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[7.1.0, )"
+            },
+            "Swashbuckle.AspNetCore.Annotations": {
+              "target": "Package",
+              "version": "[7.2.0, )"
             }
           },
           "imports": [
@@ -348,6 +356,12 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "Swashbuckle.AspNetCore.Annotations": {
+              "target": "Package",
+              "version": "[7.2.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
