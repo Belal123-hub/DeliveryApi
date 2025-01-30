@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DTO
+﻿namespace DTO
 {
     public class DishPagedListDto
     {
@@ -14,8 +8,8 @@ namespace DTO
 
     public class PageInfoModel 
     {
-        public int Size { get; set; } // Number of items per page
-        public int Count { get; set; } // Total number of items
-        public int Current { get; set; } // Current page number
+        public int Size { get; set; }
+        public int Count { get; set; }
+        public int Current { get; set; } 
     }
 }

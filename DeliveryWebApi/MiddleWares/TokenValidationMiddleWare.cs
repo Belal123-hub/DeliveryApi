@@ -1,6 +1,4 @@
-﻿using BLL.Services;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.Extensions.DependencyInjection;
+﻿using System.IdentityModel.Tokens.Jwt;
 
 namespace DeliveryWebApi.MiddleWares
 {
@@ -21,15 +19,11 @@ namespace DeliveryWebApi.MiddleWares
 
             if (!string.IsNullOrWhiteSpace(token))
             {
-                // Extract user ID from the token
                 var userId = ExtractUserIdFromToken(token);
 
                 if (userId != null)
                 {
-                    // Resolve the token service
                     var tokenService = context.RequestServices.GetRequiredService<ITokenService>();
-
-                    // Check if the user is logged out
                     var isUserLoggedOut = await tokenService.IsUserLoggedOut(userId.Value);
 
                     if (isUserLoggedOut)
@@ -38,8 +32,6 @@ namespace DeliveryWebApi.MiddleWares
                         await context.Response.WriteAsync($"User with Id = {userId} was logged out");
                         return;
                     }
-
-                    // Check if the token is blacklisted
                     var isTokenBlacklisted = await tokenService.IsTokenBlacklisted(token);
 
                     if (isTokenBlacklisted)
@@ -50,8 +42,6 @@ namespace DeliveryWebApi.MiddleWares
                     }
                 }
             }
-
-            // Continue to the next middleware
             await _next(context);
         }
 

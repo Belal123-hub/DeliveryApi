@@ -2,11 +2,7 @@
 using DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace DeliveryWebApi.Controllers
 {
@@ -35,8 +31,6 @@ namespace DeliveryWebApi.Controllers
         public async Task<IActionResult> GetOrderById(Guid orderId)
         {
             _logger.LogInformation($"Fetching order with ID: {orderId}");
-
-            // Fetch the order by ID
             var order = await _orderService.GetOrderByIdAsync(orderId);
 
             if (order == null)
@@ -74,14 +68,11 @@ namespace DeliveryWebApi.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, "Success.")]
         public async Task<IActionResult> CreateOrder([FromBody] OrderCreateDto orderCreateDto)
         {
-            // Validate the input
             if (!ModelState.IsValid)
             {
                 _logger.LogWarning("Invalid order creation data provided.");
                 return BadRequest(new { Message = "Invalid input data" });
             }
-
-            // Extract the userId from the authenticated user's claims
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
 
             if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
@@ -91,15 +82,12 @@ namespace DeliveryWebApi.Controllers
 
             try
             {
-                // Create the order from the current basket
                 var order = await _orderService.CreateOrderFromBasketAsync(userId, orderCreateDto);
 
                 if (order == null)
                 {
                     return BadRequest(new { Message = "Failed to create order or basket is empty" });
                 }
-
-                // Clear the basket after creating the order
                 var isBasketCleared = await _basketService.ClearBasketAsync(userId);
 
                 if (!isBasketCleared)

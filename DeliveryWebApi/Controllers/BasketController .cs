@@ -1,10 +1,8 @@
-﻿using Backend2024ExampleApp.Controllers;
-using BLL.Services;
+﻿using BLL.Services;
 using DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -18,21 +16,19 @@ namespace API.Controllers
     {
         private readonly ILogger<BasketController> _logger;
         private readonly IBasketService _basketService;
-
         public BasketController(IBasketService basketService, ILogger<BasketController> logger)
         {
             _basketService = basketService;
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger)); // Check for null logger
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         [Authorize]
         [HttpGet]
         [SwaggerOperation(Summary = "Get user cart.")]
-        [Produces("application/json")] 
+        [Produces("application/json")]
         [SwaggerResponse(StatusCodes.Status200OK, "Success.", typeof(DishBasketDto))]
         public async Task<IActionResult> GetAllDishesInBasket()
         {
-            // Extract the userId from the authenticated user's claims
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "Id")?.Value;
 
             if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
@@ -43,7 +39,7 @@ namespace API.Controllers
             var cart = await _basketService.GetAllDishesInBasketAsync(userId);
 
             if (cart == null || !cart.Any())
-                return NotFound(new { Message = "No dishes in the basket" });
+                return Ok(new List<DishBasketDto>());
 
             return Ok(cart);
         }

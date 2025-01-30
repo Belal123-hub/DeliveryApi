@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DAL.Data
+﻿namespace DAL.Data
 {
     public class OrderItem
     {
@@ -12,7 +6,7 @@ namespace DAL.Data
         public Guid OrderId { get; set; }
         public Order Order { get; set; }
         public Guid DishId { get; set; }
-        public Dish Dish { get; set; } // Navigation property to Dish
+        public Dish Dish { get; set; }
         public string Name { get; set; }
         public decimal Price { get; set; }
         public int Amount { get; set; }

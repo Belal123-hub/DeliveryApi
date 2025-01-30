@@ -1,5 +1,4 @@
-﻿using DAL.Configurations;
-using DAL.Data;
+﻿using DAL.Data;
 using Microsoft.AspNetCore.Identity;
 
 namespace Backend2024ExampleApp.Configuration

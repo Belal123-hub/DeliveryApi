@@ -2,12 +2,9 @@
 using DTO;
 using DAL.Data;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using System;
 using DTO.Enums;
+using Microsoft.AspNetCore.Http;
 
 namespace BLL.Services
 {
@@ -25,11 +22,12 @@ namespace BLL.Services
     {
         private readonly ILogger<OrderService> _logger;
         private readonly ApplicationDbContext _context;
-
-        public OrderService(ILogger<OrderService> logger, ApplicationDbContext context)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public OrderService(ILogger<OrderService> logger, ApplicationDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<OrderDto?> GetOrderByIdAsync(Guid orderId)
@@ -40,7 +38,7 @@ namespace BLL.Services
 
                 // Fetch the order from the database
                 var order = await _context.Orders
-                    .Include(o => o.Items) // Include related items
+                    .Include(o => o.Items)
                     .FirstOrDefaultAsync(o => o.Id == orderId);
 
                 if (order == null)
@@ -53,8 +51,8 @@ namespace BLL.Services
                 return new OrderDto
                 {
                     Id = order.Id.ToString(),
-                    DeliveryTime = order.DeliveryTime.ToString("o"), // ISO 8601 format
-                    OrderTime = order.OrderTime.ToString("o"), // ISO 8601 format
+                    DeliveryTime = order.DeliveryTime.ToString("o"),
+                    OrderTime = order.OrderTime.ToString("o"),
                     Status = order.Status,
                     Price = (double)order.Price,
                     Address = order.Address,
@@ -80,18 +78,26 @@ namespace BLL.Services
         {
             try
             {
-                _logger.LogInformation("Fetching orders from the database.");
+                var userIdClaim = _httpContextAccessor.HttpContext?.User.Claims
+                    .FirstOrDefault(c => c.Type == "Id")?.Value;
 
-                // Fetch orders from the database
-                var orders = await _context.Orders.ToListAsync();
-
-                if (orders == null || !orders.Any())
+                if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
                 {
-                    _logger.LogWarning("No orders found in the database.");
+                    _logger.LogWarning("Unauthorized access: Missing or invalid user ID.");
                     return Enumerable.Empty<OrderInfoDto>();
                 }
 
-                // Map the data to DTO
+                _logger.LogInformation($"Fetching orders for user ID: {userId}");
+                var orders = await _context.Orders
+                    .Where(o => o.UserId == userId)
+                    .ToListAsync();
+
+                if (!orders.Any())
+                {
+                    _logger.LogWarning($"No orders found for user ID: {userId}");
+                    return Enumerable.Empty<OrderInfoDto>();
+                }
+
                 var ordersDto = orders.Select(o => new OrderInfoDto
                 {
                     Id = o.Id,
@@ -101,13 +107,13 @@ namespace BLL.Services
                     Price = o.Price
                 });
 
-                _logger.LogInformation("Successfully fetched {Count} orders from the database.", ordersDto.Count());
+                _logger.LogInformation($"Successfully fetched {ordersDto.Count()} orders for user ID: {userId}");
                 return ordersDto;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while fetching orders from the database.");
-                throw; // Re-throw the exception to be handled by the controller
+                _logger.LogError(ex, "An error occurred while fetching orders.");
+                throw;
             }
         }
 
@@ -117,7 +123,15 @@ namespace BLL.Services
             {
                 _logger.LogInformation($"Creating order from basket for user: {userId}");
 
-                // Fetch the user's current basket
+                // Get the current UTC time for order placement
+                var orderTime = DateTime.UtcNow;
+
+                // Ensure delivery time is at least 1 hour after order time
+                if (orderCreateDto.DeliveryTime <= orderTime.AddHours(1))
+                {
+                    _logger.LogWarning($"Invalid delivery time for user {userId}. Delivery must be at least 1 hour after order time.");
+                    throw new BadHttpRequestException("Delivery time must be at least 1 hour after order time.");
+                }
                 var basket = await _context.Baskets
                     .Include(b => b.Items)
                     .FirstOrDefaultAsync(b => b.UserId == userId && b.DeleteDateTime == null);
@@ -132,9 +146,9 @@ namespace BLL.Services
                 var order = new Order
                 {
                     UserId = userId,
-                    DeliveryTime = orderCreateDto.DeliveryTime, 
+                    DeliveryTime = orderCreateDto.DeliveryTime,
                     Address = orderCreateDto.Address,
-                    OrderTime = DateTime.UtcNow,
+                    OrderTime = orderTime,
                     Status = OrderStatus.Pending,
                     Price = basket.Items.Sum(item => item.Price * item.Amount),
                     Items = basket.Items.Select(item => new OrderItem
@@ -150,15 +164,12 @@ namespace BLL.Services
                 // Add the order to the database
                 _context.Orders.Add(order);
                 await _context.SaveChangesAsync();
-
                 _logger.LogInformation($"Order created successfully for user: {userId}, Order ID: {order.Id}");
-
-                // Map the order to a DTO
                 return new OrderDto
                 {
                     Id = order.Id.ToString(),
-                    DeliveryTime = order.DeliveryTime.ToString("o"), // ISO 8601 format
-                    OrderTime = order.OrderTime.ToString("o"), // ISO 8601 format
+                    DeliveryTime = order.DeliveryTime.ToString("o"),
+                    OrderTime = order.OrderTime.ToString("o"),
                     Status = order.Status,
                     Price = (double)order.Price,
                     Address = order.Address,
@@ -195,19 +206,13 @@ namespace BLL.Services
                     _logger.LogWarning($"Order with ID: {orderId} not found.");
                     return false;
                 }
-
-                // Check if the order is already delivered
                 if (order.Status == OrderStatus.Delivered)
                 {
                     _logger.LogWarning($"Order with ID: {orderId} is already delivered.");
                     return false;
                 }
-
-                // Update the order status to Delivered
                 order.Status = OrderStatus.Delivered;
-                order.ModifyDateTime = DateTime.UtcNow; // Update the modification timestamp
-
-                // Save changes to the database
+                order.ModifyDateTime = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
 
                 _logger.LogInformation($"Successfully confirmed delivery for order with ID: {orderId}");

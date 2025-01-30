@@ -34,7 +34,7 @@ namespace Backend2024ExampleApp.Controllers
 
             try
             {
-                await _usersService.Register(model); // Directly pass the UserRegisterModelDto
+                await _usersService.Register(model);
             }
             catch (ArgumentException ex)
             {

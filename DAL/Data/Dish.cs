@@ -1,10 +1,4 @@
 ﻿using DTO.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace DAL.Data
 {
     public class Dish
@@ -20,8 +14,6 @@ namespace DAL.Data
         public DateTime CreateDateTime { get; set; }
         public DateTime ModifyDateTime { get; set; }
         public DateTime? DeleteDateTime { get; set; }
-
-        // Navigation property for DishRatings
         public ICollection<DishRating> DishRatings { get; set; } = new List<DishRating>();
     }
 }
