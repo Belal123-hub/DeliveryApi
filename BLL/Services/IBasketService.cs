@@ -3,7 +3,6 @@ using DAL.Data;
 using DTO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Quartz.Logging;
 
 namespace BLL.Services
 {
@@ -18,26 +17,23 @@ namespace BLL.Services
     public class BasketService : IBasketService
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<BasketService> _logger; // Declare the logger
+        private readonly ILogger<BasketService> _logger;
 
         // Modify the constructor to accept ILogger<BasketService>
         public BasketService(ApplicationDbContext context, ILogger<BasketService> logger)
         {
             _context = context;
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));  // Check for null logger
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<List<DishBasketDto>?> GetAllDishesInBasketAsync(Guid userId)
         {
-            // Fetch the user's active basket (where DeleteDateTime is null)
             var basket = await _context.Baskets
                 .Include(b => b.Items)
                 .FirstOrDefaultAsync(b => b.UserId == userId && b.DeleteDateTime == null);
 
             if (basket == null || !basket.Items.Any())
                 return null;
-
-            // Map the basket items to DishBasketDto
             var dishBasketDtos = basket.Items.Select(item => new DishBasketDto
             {
                 Id = item.DishId,
@@ -54,9 +50,13 @@ namespace BLL.Services
         public async Task<DishBasketDto?> AddDishToBasketAsync(Guid userId, Guid dishId)
         {
             var dish = await _context.Dishes.FirstOrDefaultAsync(d => d.Id == dishId);
-
-            // Fetch the user's active basket (where DeleteDateTime is null)
+            if (dish == null)
+            {
+                _logger.LogWarning($"Dish with ID {dishId} not found.");
+                return null;
+            }
             var basket = await _context.Baskets
+                .Include(b => b.Items)
                 .FirstOrDefaultAsync(b => b.UserId == userId && b.DeleteDateTime == null);
 
             if (basket == null)
@@ -66,13 +66,12 @@ namespace BLL.Services
                 {
                     UserId = userId,
                     CreateDateTime = DateTime.UtcNow,
-                    ModifyDateTime = DateTime.UtcNow
+                    ModifyDateTime = DateTime.UtcNow,
+                    Items = new List<BasketItem>() // Initialize Items list
                 };
                 _context.Baskets.Add(basket);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(); // Ensure basket is saved first
             }
-
-            // Add the dish to the basket
             var existingBasketItem = basket.Items
                 .FirstOrDefault(item => item.DishId == dishId);
 
@@ -94,15 +93,15 @@ namespace BLL.Services
                     ModifyDateTime = DateTime.UtcNow
                 };
                 basket.Items.Add(newBasketItem);
+                _context.BasketItems.Add(newBasketItem); 
             }
 
             await _context.SaveChangesAsync();
-
             var basketItem = basket.Items.First(item => item.DishId == dishId);
 
             return new DishBasketDto
             {
-                Id = basketItem.Id,
+                Id = basketItem.DishId,
                 Name = basketItem.Name,
                 Price = basketItem.Price,
                 TotalPrice = basketItem.Price * basketItem.Amount,
@@ -114,30 +113,35 @@ namespace BLL.Services
         public async Task<bool> UpdateDishQuantityInBasketAsync(Guid dishId, bool increase)
         {
             _logger.LogInformation($"Attempting to update quantity for Dish with ID: {dishId}, Increase: {increase}");
+            var dishes = await _context.BasketItems
+                .Where(b => b.DishId == dishId)
+                .ToListAsync();
 
-            var dish = await _context.BasketItems.FirstOrDefaultAsync(b => b.DishId == dishId);
-
-            if (dish == null)
+            if (dishes == null || !dishes.Any())
             {
-                _logger.LogWarning($"Dish with ID: {dishId} not found.");
+                _logger.LogWarning($"Dish with ID: {dishId} not found in any basket.");
                 return false;
             }
 
             if (increase)
             {
-                dish.Amount += 1;
-                _logger.LogInformation($"Increased quantity for Dish: {dish.Name}. New Amount: {dish.Amount}");
+                // Decrease quantity by 1
+                foreach (var dish in dishes)
+                {
+                    dish.Amount -= 1;
+                    dish.ModifyDateTime = DateTime.UtcNow;
+                    _logger.LogInformation($"Decreased quantity for Dish: {dish.Name}. New Amount: {dish.Amount}");
+                    if (dish.Amount <= 0)
+                    {
+                        _logger.LogInformation($"Quantity for Dish: {dish.Name} is zero. Removing from basket.");
+                        _context.BasketItems.Remove(dish);
+                    }
+                }
             }
             else
             {
-                dish.Amount -= 1;
-                _logger.LogInformation($"Decreased quantity for Dish: {dish.Name}. New Amount: {dish.Amount}");
-
-                if (dish.Amount <= 0)
-                {
-                    _logger.LogInformation($"Quantity for Dish: {dish.Name} is zero. Removing from basket.");
-                    _context.BasketItems.Remove(dish);
-                }
+                _logger.LogInformation($"Removing all instances of Dish: {dishes.First().Name} from the basket.");
+                _context.BasketItems.RemoveRange(dishes);
             }
 
             var result = await _context.SaveChangesAsync();
@@ -170,14 +174,8 @@ namespace BLL.Services
                     _logger.LogWarning($"No active basket found for user: {userId}");
                     return false;
                 }
-
-                // Mark the current basket as deleted
                 basket.DeleteDateTime = DateTime.UtcNow;
-
-                // Remove all items from the basket
                 _context.BasketItems.RemoveRange(basket.Items);
-
-                // Create a new basket for the user
                 var newBasket = new Basket
                 {
                     UserId = userId,

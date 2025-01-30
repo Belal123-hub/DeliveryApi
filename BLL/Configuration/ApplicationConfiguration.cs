@@ -2,7 +2,6 @@
 using BLL.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using static BLL.Services.IUsersService;
 
 namespace BLL.Configuration
 {

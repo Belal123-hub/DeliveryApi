@@ -1,17 +1,11 @@
 ﻿using DTO.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace DAL.Data
 {
     public class Order
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
-        public User User { get; set; } // Navigation property to User
+        public User User { get; set; }
         public DateTime DeliveryTime { get; set; }
         public DateTime OrderTime { get; set; }
         public OrderStatus Status { get; set; }

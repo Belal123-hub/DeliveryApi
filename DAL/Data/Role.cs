@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-
 namespace DAL.Data;
 
 public class Role : IdentityRole<Guid>, IBaseEntity

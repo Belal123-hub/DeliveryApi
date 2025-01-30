@@ -11,7 +11,7 @@ namespace BLL.Services
         Task<DishPagedListDto> GetAllDishesAsync(int page, int size, DishSorting? sorting, bool? vegetarian, DishCategory? category);
         Task<DishDto?> GetDishByIdAsync(Guid id);
         Task<bool> CanUserRateDishAsync(Guid userId, Guid dishId);
-        Task<bool> SetDishRatingAsync(Guid userId, Guid dishId, int ratingScore); // New method
+        Task<bool> SetDishRatingAsync(Guid userId, Guid dishId, int ratingScore);
 
     }
     public class DishService : IDishesService
@@ -25,14 +25,11 @@ namespace BLL.Services
 
         public async Task<DishDto?> GetDishByIdAsync(Guid id)
         {
-            // Detach any existing entity with the same ID
             var existingEntity = _context.Dishes.Local.FirstOrDefault(d => d.Id == id);
             if (existingEntity != null)
             {
                 _context.Entry(existingEntity).State = EntityState.Detached;
             }
-
-            // Fetch the dish from the database
             var dish = await _context.Dishes.FirstOrDefaultAsync(d => d.Id == id);
             if (dish == null)
                 return null;
@@ -59,11 +56,9 @@ namespace BLL.Services
             if (category.HasValue)
                 query = query.Where(d => d.Category == category.Value);
 
-            // filter by vegeterian 
             if (vegetarian.HasValue)
                 query = query.Where(d => d.IsVegetarian == vegetarian.Value);
 
-            // Apply sorting
             query = sorting switch
             {
                 DishSorting.NameAsc => query.OrderBy(d => d.Name),
@@ -75,7 +70,6 @@ namespace BLL.Services
                 _ => query
             };
 
-            // Pagination
             var totalItems = await query.CountAsync();
             var dishes = await query.Skip((page - 1) * size).Take(size).ToListAsync();
 
@@ -104,38 +98,38 @@ namespace BLL.Services
 
         public async Task<bool> CanUserRateDishAsync(Guid userId, Guid dishId)
         {
-            // Check if the dish exists
             var dishExists = await _context.Dishes.AnyAsync(d => d.Id == dishId);
             if (!dishExists)
             {
-                return false; // Dish does not exist
+                return false;
             }
-
-            // Check if the user has already rated the dish
-            var hasRated = await _context.DishRatings.AnyAsync(r => r.UserId == userId && r.DishId == dishId);
-            if (hasRated)
-            {
-                return false; // User has already rated the dish
-            }
-
-            // Optional: Check if the user has ordered the dish before (if required)
             var hasOrdered = await _context.Orders
                 .AnyAsync(o => o.UserId == userId && o.Items.Any(oi => oi.DishId == dishId));
 
-            return hasOrdered; // User can rate the dish if they have ordered it
+            return hasOrdered;
         }
 
         public async Task<bool> SetDishRatingAsync(Guid userId, Guid dishId, int ratingScore)
         {
             if (ratingScore < 1 || ratingScore > 5)
             {
-                return false;
+                return false; // Ensure rating is between 1 and 5
             }
 
             var dish = await _context.Dishes.FirstOrDefaultAsync(d => d.Id == dishId);
             if (dish == null)
             {
                 throw new InvalidOperationException("Dish not found.");
+            }
+
+            var hasDeliveredOrder = await _context.Orders
+                .AnyAsync(o => o.UserId == userId
+                    && o.Status == OrderStatus.Delivered 
+                    && o.Items.Any(oi => oi.DishId == dishId));
+
+            if (!hasDeliveredOrder)
+            {
+                return false; 
             }
 
             var existingRating = await _context.DishRatings
@@ -156,21 +150,19 @@ namespace BLL.Services
                 _context.DishRatings.Add(newRating);
             }
 
-            // Compute new average rating from DishRatings table, including the new rating
-            var ratings = await _context.DishRatings
+            await _context.SaveChangesAsync();
+
+            var allRatings = await _context.DishRatings
                 .Where(r => r.DishId == dishId)
                 .Select(r => r.RatingScore)
                 .ToListAsync();
 
-            dish.Rating = ratings.Any() ? ratings.Average() : ratingScore; // Ensure update
+            dish.Rating = allRatings.Average();
 
-            _context.Dishes.Update(dish); // Ensure EF Core tracks the change
+            _context.Dishes.Update(dish);
             await _context.SaveChangesAsync();
+
             return true;
         }
-
-
-
-
     }
 }

@@ -2,18 +2,16 @@ using System.Security.Claims;
 using System.Text;
 using Backend2024ExampleApp.Configuration;
 using BLL.Configuration;
-using BLL.Services;
 using DAL.Configurations;
 using DAL.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text.Json.Serialization; // Add this for JsonStringEnumConverter
+using System.Text.Json.Serialization;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.OpenApi.Any;
-using System.Reflection;
-using DeliveryWebApi.MiddleWares; // Add this namespace
+using DeliveryWebApi.MiddleWares;
 
 namespace Backend2024ExampleApp
 {
@@ -25,16 +23,9 @@ namespace Backend2024ExampleApp
 
             // Configure Services
             ConfigureServices(builder);
-
             var app = builder.Build();
-
-            // Apply Database Migrations
             ApplyDatabaseMigrations(app);
-
-            // Configure Middlewares
             ConfigureMiddlewares(app);
-
-            // Run the Application
             await app.ConfigureIdentityAsync();
             app.Run();
         }
@@ -48,19 +39,11 @@ namespace Backend2024ExampleApp
                     // Convert enums to strings in JSON responses
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
-
-            // Configure Swagger
             ConfigureSwagger(builder);
-
-            // Configure Data Access Layer (DAL) and Business Logic Layer (BLL)
             builder.ConfigureDal();
             builder.ConfigureBll();
             builder.Services.AddLogging();
-
-            // Configure JWT Authentication
             ConfigureJwtAuthentication(builder);
-
-            // Configure Authorization Policies
             ConfigureAuthorization(builder);
         }
 
@@ -72,9 +55,7 @@ namespace Backend2024ExampleApp
                 options.EnableAnnotations(); // Enable Swagger annotations
                 // Configure Swagger to display enums as strings
                 options.UseAllOfToExtendReferenceSchemas();
-                options.SchemaFilter<EnumSchemaFilter>(); // Add custom schema filter
-
-                // Configure JWT authentication in Swagger
+                options.SchemaFilter<EnumSchemaFilter>();
                 options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Scheme = "bearer",
@@ -169,7 +150,6 @@ namespace Backend2024ExampleApp
         }
     }
 
-    // Custom schema filter to display enums as strings in Swagger
     public class EnumSchemaFilter : ISchemaFilter
     {
         public void Apply(OpenApiSchema schema, SchemaFilterContext context)

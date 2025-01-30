@@ -13,8 +13,6 @@ namespace DeliveryWebApi.Controllers
     {
         private readonly IDishesService _dishesService;
         private readonly ILogger<OrderController> _logger;
-
-
         public DishController(IDishesService dishesService, ILogger<OrderController> logger)
         {
             _dishesService = dishesService;
@@ -63,7 +61,6 @@ namespace DeliveryWebApi.Controllers
         {
             try
             {
-                // Get the authenticated user's ID
                 var userIdClaim = User.Claims.FirstOrDefault(x => x.Type == "Id");
                 if (userIdClaim == null)
                 {
@@ -71,8 +68,6 @@ namespace DeliveryWebApi.Controllers
                 }
 
                 var userId = Guid.Parse(userIdClaim.Value);
-
-                // Check if the user can rate the dish
                 var canRate = await _dishesService.CanUserRateDishAsync(userId, id);
 
                 return Ok(canRate);
@@ -97,7 +92,6 @@ namespace DeliveryWebApi.Controllers
         {
             try
             {
-                // Get the authenticated user's ID
                 var userIdClaim = User.Claims.FirstOrDefault(x => x.Type == "Id");
                 if (userIdClaim == null)
                 {
@@ -105,15 +99,11 @@ namespace DeliveryWebApi.Controllers
                 }
 
                 var userId = Guid.Parse(userIdClaim.Value);
-
-                // Check if the user can rate the dish
                 var canRate = await _dishesService.CanUserRateDishAsync(userId, id);
                 if (!canRate)
                 {
-                    return Forbid(); // User is not allowed to rate the dish
+                    return Forbid();
                 }
-
-                // Set the rating
                 var result = await _dishesService.SetDishRatingAsync(userId, id, ratingScore);
                 if (!result)
                 {

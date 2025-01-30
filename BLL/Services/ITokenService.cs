@@ -11,7 +11,6 @@ public interface ITokenService
 public class TokenService : ITokenService
 {
     private readonly ApplicationDbContext _context;
-
     public TokenService(ApplicationDbContext context)
     {
         _context = context;

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BLL.Configuration
+﻿namespace BLL.Configuration
 {
     public class JwtBearerTokenSettings
     {
@@ -12,6 +6,6 @@ namespace BLL.Configuration
         public string Audience { get; set; }
         public string Issuer { get; set; }
         public int AccessTokenExpiryTimeInSeconds { get; set; }
-        public int RefreshTokenExpiryTimeInDays { get; set; }
+        public double RefreshTokenExpiryTimeInDays { get; set; }
     }
 }
